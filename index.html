@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aurum Atelier — Fine Jewellery</title>
+<meta name="description" content="Aurum Atelier — hand-made fine jewellery in 22-karat gold and conflict-free stones, from a small atelier in Bikaner, Rajasthan. Front-end demo store.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{--bg:#f4ecd9;--bg-2:#efe4cb;--panel:#fbf4e3;--fg:#2a2114;--muted:#837255;--faint:#ab9c7d;--line:rgba(169,119,42,.30);--line-soft:rgba(42,33,20,.12);--gold:#a9772a;--gold-soft:#d8b773;--gold-bright:#c2923a;--cream-on-dark:#f5ecd7;--ink:#241d12;--good:#3f7d4f;--radius:4px;--maxw:1240px;--fd:"Anton","Arial Narrow",Impact,sans-serif;--fb:"Archivo",ui-sans-serif,system-ui,sans-serif;--fm:"JetBrains Mono",ui-monospace,Menlo,monospace;color-scheme:light}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--fb);font-weight:300;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.035;mix-blend-mode:multiply;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}
+a{color:inherit;text-decoration:none}img{max-width:100%;display:block}button{font-family:inherit}
+.wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding-left:max(22px,env(safe-area-inset-left,0px));padding-right:max(22px,env(safe-area-inset-right,0px))}
+.label{font-family:var(--fm);font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.gold{color:var(--gold)}
+.shot{position:relative;background-size:cover;background-position:center;overflow:hidden;isolation:isolate;background-color:#1a1308}
+.shot::before{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(120% 90% at 75% 15%,rgba(216,183,115,.18),transparent 55%),linear-gradient(180deg,rgba(26,19,8,.28) 0%,rgba(26,19,8,.55) 55%,rgba(26,19,8,.82) 100%)}
+.shot>*{position:relative;z-index:2}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-family:var(--fm);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;padding:.9rem 1.5rem;border-radius:999px;cursor:pointer;border:1px solid var(--line);background:none;color:var(--fg);transition:background .2s,color .2s,border-color .2s}
+.btn.primary{background:var(--gold);color:#fff;border-color:var(--gold);font-weight:500}.btn.primary:hover{background:var(--gold-bright);border-color:var(--gold-bright)}
+.btn.ink{background:var(--ink);color:var(--cream-on-dark);border-color:var(--ink)}.btn.ink:hover{background:#3a2f1c}
+.btn.ghost:hover{border-color:var(--gold);color:var(--gold)}.btn.block{width:100%}
+header.nav{position:sticky;top:0;z-index:50;background:rgba(244,236,217,.9);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav-row{display:flex;align-items:center;justify-content:space-between;padding-block:15px;gap:1rem}
+.brand{font-family:var(--fd);font-size:1.5rem;letter-spacing:.05em;line-height:1}.brand .dot{color:var(--gold)}
+.nav-links{display:flex;gap:1.8rem}.nav-links a{font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);transition:color .2s}.nav-links a:hover,.nav-links a.active{color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.icon-btn{background:none;border:1px solid var(--line);border-radius:999px;padding:.5rem .9rem;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--fg);cursor:pointer;transition:border-color .2s,color .2s}.icon-btn:hover{border-color:var(--gold);color:var(--gold)}
+.bag-dot{color:var(--gold);font-weight:600}
+.menu-btn{display:none;background:none;border:0;color:var(--fg);font-family:var(--fm);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer}
+.hero{padding-top:clamp(1.5rem,4vw,2.5rem)}
+.hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(1.2rem,3vw,2.4rem);align-items:stretch;min-height:min(78vh,720px)}
+.hero-left{display:flex;flex-direction:column;justify-content:center;padding-block:clamp(1.5rem,4vw,3rem);min-width:0}
+.hero h1{font-family:var(--fd);font-weight:400;font-size:clamp(3.2rem,10vw,8rem);line-height:.86;margin:1.1rem 0 0;text-transform:uppercase}
+.hero h1 .stroke{color:transparent;-webkit-text-stroke:1.4px var(--gold)}
+.hero p.sub{max-width:42ch;margin:1.5rem 0 0;color:var(--muted);font-size:clamp(.95rem,1.5vw,1.05rem)}
+.hero-cta{display:flex;gap:1rem;margin-top:2rem;flex-wrap:wrap}
+.hero-media{position:relative;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;min-height:360px;background:#1a1308}
+.hero-media video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.hero-media::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(26,19,8,.1),rgba(26,19,8,.55))}
+.hero-media .tag{position:absolute;z-index:3}.hero-media .tag.tr{right:16px;top:16px;color:var(--gold-soft)}.hero-media .tag.bl{left:16px;bottom:16px;color:var(--cream-on-dark)}
+.marquee{border-block:1px solid var(--line);overflow:hidden;margin-top:clamp(1.4rem,4vw,2.4rem);background:var(--bg-2)}
+.marquee-track{display:flex;gap:2.4rem;width:max-content;padding-block:14px;animation:slide 30s linear infinite}
+.marquee-track span{font-family:var(--fm);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);white-space:nowrap}.marquee-track b{color:var(--gold);font-weight:400}
+@keyframes slide{to{transform:translateX(-50%)}}
+section.block{padding-block:clamp(3rem,7vw,5.5rem)}
+.sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:clamp(1.4rem,3.5vw,2.4rem)}
+.sec-head h2{font-family:var(--fd);font-weight:400;text-transform:uppercase;font-size:clamp(1.8rem,4.6vw,3rem);line-height:.95;margin:.4rem 0 0}
+.sec-head .idx{font-family:var(--fm);font-size:.72rem;color:var(--gold);letter-spacing:.1em}
+.sec-head a.more{font-family:var(--fm);font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--line);padding-bottom:3px}
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(.8rem,2vw,1.2rem)}
+.cat{position:relative;aspect-ratio:3/4;border-radius:var(--radius);border:1px solid var(--line-soft);display:flex;align-items:flex-end;padding:1.1rem;transition:transform .25s}
+.cat:hover{transform:translateY(-4px);border-color:var(--gold)}
+.cat .cat-name{font-family:var(--fd);text-transform:uppercase;font-size:clamp(1.1rem,2vw,1.5rem);color:var(--cream-on-dark)}
+.cat .cat-c{font-family:var(--fm);font-size:.62rem;letter-spacing:.18em;color:var(--gold-soft);position:absolute;top:14px;left:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:clamp(1rem,2.4vw,1.5rem)}
+.card{position:relative;border:1px solid var(--line-soft);border-radius:var(--radius);overflow:hidden;background:var(--panel);display:flex;flex-direction:column;transition:border-color .25s,transform .25s,box-shadow .25s}
+.card:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:0 20px 40px -28px rgba(42,33,20,.5)}
+.card .thumb{position:relative;aspect-ratio:4/5;overflow:hidden;background:#1a1308;display:block}
+.card .thumb img{width:100%;height:100%;object-fit:cover;transition:transform .5s ease}.card:hover .thumb img{transform:scale(1.06)}
+.card .badge{position:absolute;top:12px;left:12px;z-index:2;font-family:var(--fm);font-size:.58rem;letter-spacing:.14em;text-transform:uppercase;background:var(--gold);color:#fff;padding:.25rem .5rem;border-radius:3px}
+.card .quick{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;opacity:0;transform:translateY(8px);transition:opacity .25s,transform .25s}.card:hover .quick{opacity:1;transform:none}
+.card .meta{padding:.9rem 1rem 1rem;display:flex;flex-direction:column;gap:.15rem}
+.card .meta .cat-t{font-family:var(--fm);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+.card .meta .name{font-family:var(--fd);text-transform:uppercase;font-size:1.25rem;line-height:1;margin-top:.2rem}
+.card .meta .price{font-family:var(--fm);font-size:.85rem;color:var(--gold);margin-top:.35rem}.card .meta .price .was{color:var(--faint);text-decoration:line-through;margin-left:.5rem;font-size:.75rem}
+.page-head{padding-top:clamp(2rem,5vw,3.5rem)}.page-head h1{font-family:var(--fd);font-weight:400;text-transform:uppercase;font-size:clamp(2.4rem,7vw,5rem);line-height:.9;margin:.6rem 0 0}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin:1.6rem 0;padding-block:1rem;border-block:1px solid var(--line)}
+.filters{display:flex;gap:.5rem;flex-wrap:wrap}
+.chip{font-family:var(--fm);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;padding:.5rem .9rem;border:1px solid var(--line);border-radius:999px;background:none;color:var(--fg);cursor:pointer;transition:all .2s}
+.chip.active,.chip[aria-pressed="true"]{background:var(--gold);color:#fff;border-color:var(--gold)}.chip:hover:not(.active):not([aria-pressed="true"]){border-color:var(--gold)}
+.sort{display:flex;align-items:center;gap:.6rem}.sort select{font-family:var(--fm);font-size:.72rem;letter-spacing:.06em;padding:.5rem .7rem;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--fg);cursor:pointer}
+.count{font-family:var(--fm);font-size:.68rem;letter-spacing:.1em;color:var(--muted)}
+.statement{position:relative;overflow:hidden;border-block:1px solid var(--line)}
+.statement .inner{position:relative;z-index:3;min-height:min(62vh,560px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-block:clamp(3rem,8vw,6rem);gap:1rem}
+.giant{font-family:var(--fd);font-weight:400;text-transform:uppercase;white-space:nowrap;font-size:clamp(4.5rem,22vw,18rem);line-height:.8;color:transparent;-webkit-text-stroke:1.5px rgba(245,236,215,.72)}
+.statement .caption{max-width:34ch;color:var(--cream-on-dark);font-size:clamp(1rem,2vw,1.25rem)}.statement .caption .accent{color:var(--gold-soft)}
+.atelier-grid{display:grid;grid-template-columns:repeat(12,1fr);gap:clamp(.8rem,2vw,1.4rem)}
+.tile{border:1px solid var(--line-soft);border-radius:var(--radius)}
+.tile .label{position:absolute;left:16px;top:16px;z-index:3;color:var(--gold-soft)}
+.tile .cap{position:absolute;left:16px;bottom:16px;right:16px;z-index:3}
+.tile .cap h3{font-family:var(--fd);font-weight:400;text-transform:uppercase;font-size:clamp(1.1rem,2.4vw,1.5rem);margin:0 0 .25rem;color:var(--cream-on-dark)}
+.tile .cap p{margin:0;font-size:.82rem;color:#e8dcc2;max-width:34ch}
+.t-a{grid-column:span 7;aspect-ratio:16/10}.t-b{grid-column:span 5;aspect-ratio:4/5;align-self:end}.t-c{grid-column:span 5;aspect-ratio:5/4}.t-d{grid-column:span 7;aspect-ratio:16/9;align-self:start}
+.reviews{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem}
+.review{border:1px solid var(--line-soft);border-radius:var(--radius);padding:1.4rem;background:var(--panel)}
+.review .stars{color:var(--gold);letter-spacing:.15em;font-size:.9rem}.review p{margin:.8rem 0 0;font-size:.95rem}
+.review .who{margin-top:1rem;font-family:var(--fm);font-size:.66rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.news{border:1px solid var(--line);border-radius:var(--radius);padding:clamp(1.8rem,4vw,3rem);text-align:center;background:var(--panel)}
+.news h2{font-family:var(--fd);font-weight:400;text-transform:uppercase;font-size:clamp(1.8rem,4vw,2.8rem);margin:.4rem 0 0}
+.news form{display:flex;gap:.6rem;max-width:460px;margin:1.4rem auto 0;flex-wrap:wrap}
+.news input{flex:1;min-width:180px;padding:.9rem 1rem;border:1px solid var(--line);border-radius:999px;background:var(--bg);color:var(--fg);font-family:var(--fb)}
+.news .msg{margin-top:.8rem;font-family:var(--fm);font-size:.72rem;color:var(--good);min-height:1rem}
+.pdp{display:grid;grid-template-columns:1fr 1fr;gap:clamp(1.5rem,4vw,3rem);padding-top:clamp(1.5rem,4vw,2.5rem)}
+.pdp .main{aspect-ratio:4/5;border-radius:var(--radius);overflow:hidden;border:1px solid var(--line-soft);background:#1a1308}.pdp .main img{width:100%;height:100%;object-fit:cover}
+.pdp .info{display:flex;flex-direction:column}
+.pdp .crumbs{font-family:var(--fm);font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.pdp .info h1{font-family:var(--fd);font-weight:400;text-transform:uppercase;font-size:clamp(2.4rem,6vw,4rem);line-height:.9;margin:1rem 0 0}
+.pdp .price{font-family:var(--fm);font-size:1.25rem;color:var(--gold);margin:1.2rem 0 0}.pdp .price .was{color:var(--faint);text-decoration:line-through;font-size:.9rem;margin-left:.6rem}
+.pdp .desc{color:var(--muted);margin:1.2rem 0 0;max-width:46ch}
+.opt{margin-top:1.5rem}.opt .opt-label{display:flex;justify-content:space-between;margin-bottom:.55rem}.opt .opt-label .sel{color:var(--gold)}
+.chips-row{display:flex;gap:.5rem;flex-wrap:wrap}
+.pdp .buy{display:flex;gap:.8rem;margin-top:1.8rem;flex-wrap:wrap}
+.pdp .assurance{margin-top:1.4rem;display:flex;gap:1.2rem;flex-wrap:wrap;font-family:var(--fm);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.pdp .assurance span::before{content:"\2713 ";color:var(--gold)}
+.drawer-back{position:fixed;inset:0;z-index:80;background:rgba(36,29,18,.5);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s}.drawer-back.open{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;z-index:81;width:min(420px,92vw);background:var(--panel);border-left:1px solid var(--line);transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}.drawer.open{transform:none}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;padding:1.2rem 1.3rem;border-bottom:1px solid var(--line)}.drawer-head h3{font-family:var(--fd);font-weight:400;text-transform:uppercase;font-size:1.4rem;margin:0}
+.drawer-items{flex:1;overflow-y:auto;padding:1rem 1.3rem;display:flex;flex-direction:column;gap:1rem}
+.d-item{display:grid;grid-template-columns:64px 1fr auto;gap:.9rem;align-items:center}.d-item img{width:64px;height:80px;object-fit:cover;border-radius:3px;background:#1a1308}
+.d-item .dn{font-family:var(--fd);text-transform:uppercase;font-size:1.05rem;line-height:1}.d-item .do{font-family:var(--fm);font-size:.64rem;color:var(--muted);letter-spacing:.06em;margin-top:.25rem}
+.d-item .dp{font-family:var(--fm);font-size:.8rem;color:var(--gold)}
+.d-item .rm{background:none;border:0;color:var(--faint);cursor:pointer;font-size:.7rem;font-family:var(--fm);text-transform:uppercase;letter-spacing:.08em;margin-top:.3rem}.d-item .rm:hover{color:var(--gold)}
+.drawer-foot{padding:1.2rem 1.3rem;border-top:1px solid var(--line)}.drawer-foot .sub{display:flex;justify-content:space-between;font-family:var(--fm);font-size:.9rem;margin-bottom:1rem}.drawer-foot .sub b{color:var(--gold)}
+.empty{color:var(--muted);font-size:.9rem;text-align:center;padding:2rem 0}
+.cart-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:clamp(1.5rem,4vw,2.5rem);align-items:start;padding-top:clamp(1.5rem,4vw,2.5rem)}
+.c-row{display:grid;grid-template-columns:90px 1fr auto;gap:1.1rem;align-items:center;padding:1.2rem 0;border-bottom:1px solid var(--line-soft)}
+.c-row img{width:90px;height:112px;object-fit:cover;border-radius:3px;background:#1a1308}
+.c-row .cn{font-family:var(--fd);text-transform:uppercase;font-size:1.3rem;line-height:1}.c-row .co{font-family:var(--fm);font-size:.66rem;letter-spacing:.08em;color:var(--muted);margin-top:.3rem}
+.qty{display:inline-flex;align-items:center;border:1px solid var(--line);border-radius:999px;margin-top:.6rem}.qty button{background:none;border:0;width:30px;height:30px;cursor:pointer;color:var(--fg);font-size:1rem}.qty span{min-width:26px;text-align:center;font-family:var(--fm);font-size:.85rem}
+.c-row .cp{font-family:var(--fm);color:var(--gold);white-space:nowrap}
+.summary{border:1px solid var(--line);border-radius:var(--radius);padding:1.6rem;background:var(--panel);position:sticky;top:90px}
+.summary h3{font-family:var(--fd);font-weight:400;text-transform:uppercase;margin:0 0 1rem}
+.summary .line{display:flex;justify-content:space-between;font-family:var(--fm);font-size:.85rem;padding:.5rem 0;color:var(--muted)}
+.summary .total{color:var(--fg);font-size:1.05rem;border-top:1px solid var(--line);margin-top:.5rem;padding-top:1rem}.summary .total b{color:var(--gold)}
+footer{border-top:1px solid var(--line);padding-block:clamp(2.5rem,6vw,4rem);margin-top:clamp(2rem,5vw,3rem)}
+.foot-grid{display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap}.foot-brand .brand{font-size:2.2rem}.foot-brand p{color:var(--muted);font-size:.85rem;margin:.8rem 0 0;max-width:34ch}
+.foot-col h4{font-family:var(--fm);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin:0 0 .9rem}
+.foot-col a{display:block;font-size:.85rem;margin-bottom:.5rem;opacity:.82}.foot-col a:hover{opacity:1;color:var(--gold)}
+.foot-base{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-top:clamp(2rem,5vw,3rem);padding-top:1.4rem;border-top:1px solid var(--line-soft)}
+.foot-base span{font-family:var(--fm);font-size:.68rem;letter-spacing:.1em;color:var(--faint);text-transform:uppercase}
+.mobile-menu{position:fixed;inset:0;z-index:90;background:var(--bg);display:none;flex-direction:column;padding:90px 22px 40px;gap:1rem}.mobile-menu.open{display:flex}
+.mobile-menu a{font-family:var(--fd);text-transform:uppercase;font-size:2rem}.mobile-menu a:hover{color:var(--gold)}
+.mm-close{position:absolute;top:24px;right:22px;background:none;border:0;color:var(--fg);font-family:var(--fm);font-size:.8rem;letter-spacing:.1em;cursor:pointer}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);z-index:95;background:var(--ink);color:var(--cream-on-dark);font-family:var(--fm);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;padding:.9rem 1.4rem;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .3s,transform .3s}.toast.show{opacity:1;transform:translateX(-50%)}
+@media(max-width:900px){.cats{grid-template-columns:repeat(2,1fr)}.reviews{grid-template-columns:1fr}.pdp{grid-template-columns:1fr}.cart-grid{grid-template-columns:1fr}.summary{position:static}}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr;min-height:0}.hero-media{min-height:52vh;order:-1}.t-a,.t-b,.t-c,.t-d{grid-column:span 12;align-self:auto}}
+@media(max-width:720px){.nav-links{display:none}.menu-btn{display:block}}
+@media(prefers-reduced-motion:reduce){.marquee-track{animation:none}*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="nav"><div class="wrap nav-row">
+  <a href="#/" class="brand">AURUM<span class="dot">.</span></a>
+  <nav class="nav-links" id="navLinks">
+    <a href="#/shop">Shop</a><a href="#/shop/Rings">Rings</a><a href="#/shop/Necklaces">Necklaces</a><a href="#/#atelier">Atelier</a>
+  </nav>
+  <div class="nav-right">
+    <button class="icon-btn js-bag-open">Bag (<span class="js-bag-count bag-dot">0</span>)</button>
+    <button class="menu-btn" id="menuBtn">Menu</button>
+  </div>
+</div></header>
+
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mm-close" id="mmClose">Close &#10005;</button>
+  <a href="#/shop">Shop</a><a href="#/shop/Rings">Rings</a><a href="#/shop/Necklaces">Necklaces</a><a href="#/shop/Earrings">Earrings</a><a href="#/shop/Pendants">Pendants</a><a href="#/cart">Bag</a>
+</div>
+
+<div id="app"></div>
+
+<div class="drawer-back" id="drawerBack"></div>
+<aside class="drawer" id="drawer" aria-label="Shopping bag">
+  <div class="drawer-head"><h3>Your Bag</h3><button class="icon-btn js-drawer-close">Close</button></div>
+  <div class="drawer-items" id="drawerItems"></div>
+  <div class="drawer-foot">
+    <div class="sub"><span>Subtotal</span><b id="drawerSub">&#8377;0</b></div>
+    <button class="btn ink block" id="drawerCheckout">Checkout</button>
+    <a class="btn ghost block" href="#/cart" style="margin-top:.6rem">View full bag</a>
+  </div>
+</aside>
+
+<script>
+(function(){
+"use strict";
+var P="https://images.pexels.com/photos/";
+function IMG(b,w){return P+b+"?auto=compress&cs=tinysrgb&w="+(w||800);}
+var VID="https://videos.pexels.com/video-files/31291134/13361158_720_1280_60fps.mp4";
+var POSTER="https://images.pexels.com/photos/9617682/pexels-photo-9617682.jpeg?auto=compress&cs=tinysrgb&w=800";
+var PRODUCTS=[
+{id:"solace",name:"Solace",cat:"Rings",price:184000,ref:"AUR-114",base:"2732096/pexels-photo-2732096.jpeg",desc:"A single brilliant held in a whisper of gold. Cut to catch low light, set to be worn every day of a life."},
+{id:"regent",name:"Regent",cat:"Rings",price:310000,ref:"AUR-188",base:"32988530/pexels-photo-32988530.jpeg",desc:"A Panna emerald in a cushion of old-cut diamonds. One stone, one ring, one owner."},
+{id:"lumen",name:"Lumen",cat:"Rings",price:152000,ref:"AUR-133",base:"4943485/pexels-photo-4943485.jpeg",desc:"A trio of hand-forged bands, warm as the earth they were drawn from. Worn together or apart."},
+{id:"eclat",name:"Éclat",cat:"Necklaces",price:240000,ref:"AUR-207",base:"29043373/free-photo-of-elegant-gold-jewelry-display-in-store.jpeg",desc:"A line of graduated stones that reads almost like water at the collarbone. Quiet until it isn't."},
+{id:"noor",name:"Noor",cat:"Necklaces",price:286000,ref:"AUR-221",base:"12217206/pexels-photo-12217206.jpeg",desc:"An ornamented pendant on a fine chain, drawn in the old Rajasthan manner by a single hand."},
+{id:"aurora",name:"Aurora",cat:"Pendants",price:94000,ref:"AUR-090",base:"7700270/pexels-photo-7700270.jpeg",desc:"A solitary drop on a fine chain — the smallest piece in the house, and the one we're asked for most."},
+{id:"halo",name:"Halo",cat:"Earrings",price:68000,was:74000,ref:"AUR-061",base:"31285201/free-photo-of-elegant-gold-earring-on-a-woman-s-ear.jpeg",desc:"Sculptural 22K gold that catches the light along its edge — featherweight, worn solo or paired."}
+];
+var METALS=["22K Yellow","18K Rose","18K White"],SIZES=["10","12","14","16","18"];
+var CATS=[{n:"Rings",b:"2732096/pexels-photo-2732096.jpeg"},{n:"Necklaces",b:"29043373/free-photo-of-elegant-gold-jewelry-display-in-store.jpeg"},{n:"Earrings",b:"31285201/free-photo-of-elegant-gold-earring-on-a-woman-s-ear.jpeg"},{n:"Pendants",b:"12217206/pexels-photo-12217206.jpeg"}];
+var ATELIER=[["15955333/free-photo-of-close-up-of-person-making-a-pendant.jpeg","Cast in Fire · 001","Cast in fire","Every form begins in wax, then is cast in molten 22-karat gold.","t-a"],["31128289/free-photo-of-artisan-crafting-gold-jewelry-in-workshop-setting.jpeg","The Setting · 002","Set by hand","Each stone is seated under the loupe, prong by prong.","t-b"],["11041197/pexels-photo-11041197.jpeg","Mirror Polish · 003","Seven grits","Polished until the metal holds the light like still water.","t-c"],["18706408/pexels-photo-18706408.jpeg","Fitted & Sealed · 004","Weighed & hallmarked","Certified for purity, logged, and sealed with a lifetime card.","t-d"]];
+function byId(id){return PRODUCTS.filter(function(p){return p.id===id;})[0];}
+function inr(n){return "₹"+Number(n).toLocaleString("en-IN");}
+var KEY="aurum_cart_v1";
+function getCart(){try{return JSON.parse(localStorage.getItem(KEY))||[];}catch(e){return[];}}
+function saveCart(c){try{localStorage.setItem(KEY,JSON.stringify(c));}catch(e){}updateNav();}
+function cartCount(){return getCart().reduce(function(s,i){return s+i.qty;},0);}
+function cartSubtotal(){return getCart().reduce(function(s,i){var p=byId(i.id);return s+(p?p.price*i.qty:0);},0);}
+function addToCart(id,metal,size,qty){var c=getCart();var m=metal||METALS[0],s=size||SIZES[2],q=qty||1;var r=c.filter(function(i){return i.id===id&&i.metal===m&&i.size===s;})[0];if(r)r.qty+=q;else c.push({id:id,metal:m,size:s,qty:q});saveCart(c);renderDrawer();openDrawer();var p=byId(id);toast((p?p.name:"Item")+" added to bag");}
+function removeAt(i){var c=getCart();c.splice(i,1);saveCart(c);renderDrawer();if(location.hash.indexOf("/cart")>-1)route();}
+function setQty(i,d){var c=getCart();if(!c[i])return;c[i].qty+=d;if(c[i].qty<1)c.splice(i,1);saveCart(c);renderDrawer();if(location.hash.indexOf("/cart")>-1)route();}
+function updateNav(){var n=cartCount();[].forEach.call(document.querySelectorAll(".js-bag-count"),function(e){e.textContent=n;});}
+var toastEl;function toast(msg){if(!toastEl){toastEl=document.createElement("div");toastEl.className="toast";document.body.appendChild(toastEl);}toastEl.textContent=msg;toastEl.classList.add("show");clearTimeout(toastEl._t);toastEl._t=setTimeout(function(){toastEl.classList.remove("show");},2200);}
+function cardHTML(p){var pr='<span class="price">'+inr(p.price)+(p.was?'<span class="was">'+inr(p.was)+'</span>':'')+'</span>';return '<div class="card"><a class="thumb" href="#/product/'+p.id+'">'+(p.was?'<span class="badge">Sale</span>':'')+'<img loading="lazy" src="'+IMG(p.base,700)+'" alt="'+p.name+'"></a><div class="quick"><button class="btn primary block js-add" data-id="'+p.id+'">Add to bag</button></div><a class="meta" href="#/product/'+p.id+'"><span class="cat-t">'+p.cat+'</span><span class="name">'+p.name+'</span>'+pr+'</a></div>';}
+function drawerEls(){return{back:document.getElementById("drawerBack"),drawer:document.getElementById("drawer")};}
+function openDrawer(){var e=drawerEls();e.back.classList.add("open");e.drawer.classList.add("open");}
+function closeDrawer(){var e=drawerEls();e.back.classList.remove("open");e.drawer.classList.remove("open");}
+function renderDrawer(){var box=document.getElementById("drawerItems");if(!box)return;var c=getCart();if(!c.length){box.innerHTML='<p class="empty">Your bag is empty.</p>';}else{box.innerHTML=c.map(function(i,idx){var p=byId(i.id);if(!p)return"";return '<div class="d-item"><img src="'+IMG(p.base,180)+'" alt="'+p.name+'"><div><div class="dn">'+p.name+'</div><div class="do">'+i.metal+' · Size '+i.size+' · Qty '+i.qty+'</div><button class="rm" data-rm="'+idx+'">Remove</button></div><div class="dp">'+inr(p.price*i.qty)+'</div></div>';}).join("");}var s=document.getElementById("drawerSub");if(s)s.textContent=inr(cartSubtotal());}
+
+/* -------- views -------- */
+function viewHome(){
+  var cats=CATS.map(function(c,i){return '<a class="cat shot" href="#/shop/'+c.n+'" style="background-image:url(\''+IMG(c.b,600)+'\')"><span class="cat-c">0'+(i+1)+'</span><span class="cat-name">'+c.n+'</span></a>';}).join("");
+  var feat=PRODUCTS.slice(0,4).map(cardHTML).join("");
+  var tiles=ATELIER.map(function(t){return '<div class="tile shot '+t[4]+'" style="background-image:url(\''+IMG(t[0],1000)+'\')"><span class="label">'+t[1]+'</span><div class="cap"><h3>'+t[2]+'</h3><p>'+t[3]+'</p></div></div>';}).join("");
+  return '<main><section class="hero wrap"><div class="hero-grid"><div class="hero-left"><span class="label">Fine Jewellery · Est. Bikaner · MMXIV</span><h1>Shaped<br><span class="stroke">by</span><br>Fire</h1><p class="sub">Jewellery drawn by hand from 22-karat gold and conflict-free stones — made the slow way, in a Rajasthan atelier, for those who keep it for life.</p><div class="hero-cta"><a href="#/shop" class="btn primary">Shop the collection</a><a href="#/#atelier" class="btn ghost">Inside the atelier</a></div></div><div class="hero-media"><video autoplay muted loop playsinline preload="metadata" poster="'+POSTER+'"><source src="'+VID+'" type="video/mp4"></video><span class="tag tr label">Film · AW26</span><span class="tag bl label">22K · Hand-set</span></div></div></section>'+
+  '<div class="marquee"><div class="marquee-track"><span>22K Gold</span><span class="gold">◆</span><span>BIS Hallmarked</span><span class="gold">◆</span><span>Hand-finished</span><span class="gold">◆</span><span><b>Conflict-free</b> stones</span><span class="gold">◆</span><span>Lifetime care</span><span class="gold">◆</span><span>Made in Bikaner</span><span class="gold">◆</span><span>22K Gold</span><span class="gold">◆</span><span>BIS Hallmarked</span><span class="gold">◆</span><span>Hand-finished</span><span class="gold">◆</span><span><b>Conflict-free</b> stones</span><span class="gold">◆</span><span>Lifetime care</span><span class="gold">◆</span><span>Made in Bikaner</span><span class="gold">◆</span></div></div>'+
+  '<section class="block wrap"><div class="sec-head"><div><span class="idx">Browse</span><h2>Shop by category</h2></div><a class="more" href="#/shop">All pieces →</a></div><div class="cats">'+cats+'</div></section>'+
+  '<section class="block wrap"><div class="sec-head"><div><span class="idx">01 — The Collection</span><h2>Signature pieces</h2></div><a class="more" href="#/shop">View all →</a></div><div class="grid">'+feat+'</div></section>'+
+  '<section class="block wrap" id="atelier"><div class="sec-head"><div><span class="idx">02 — The Atelier</span><h2>Made, not<br>manufactured</h2></div><span class="label">Process 001 — 004</span></div><div class="atelier-grid">'+tiles+'</div></section></main>'+
+  '<section class="statement shot" style="background-image:url(\''+IMG("9617682/pexels-photo-9617682.jpeg",1600)+'\')"><div class="inner wrap"><span class="label">The House of Aurum</span><div class="giant">AURUM</div><p class="caption">Jewellery made the <span class="accent">slow way</span>, for a life that moves fast.</p><a href="#/shop" class="btn ghost" style="margin-top:.6rem;color:var(--cream-on-dark);border-color:rgba(245,236,215,.4)">Explore the collection</a></div></section>'+
+  '<main><section class="block wrap"><div class="sec-head"><div><span class="idx">Loved by</span><h2>From the vault</h2></div></div><div class="reviews"><div class="review"><div class="stars">★★★★★</div><p>“My Solace ring arrived in a hand-stitched box with a certificate. The finish is unreal.”</p><div class="who">Aditi R. · Jaipur</div></div><div class="review"><div class="stars">★★★★★</div><p>“Commissioned a bespoke emerald piece. Three weeks, constant updates, better than the reference.”</p><div class="who">Kabir M. · Delhi</div></div><div class="review"><div class="stars">★★★★★</div><p>“You can feel the hand-work. This is not mall jewellery — it’s an heirloom.”</p><div class="who">Meera S. · Bikaner</div></div></div></section>'+
+  '<section class="block wrap"><div class="news"><span class="label">The List</span><h2>First look at new editions</h2><form id="newsForm"><input type="email" placeholder="your@email.com" required aria-label="Email"><button class="btn ink" type="submit">Join</button></form><div class="msg" id="newsMsg"></div></div></section></main>';
+}
+var shopState={cat:"All",sort:"featured"};
+function viewShop(cat){
+  shopState.cat=cat||"All";shopState.sort="featured";
+  var chips=["All","Rings","Necklaces","Earrings","Pendants"].map(function(c){return '<button class="chip'+(c===shopState.cat?" active":"")+'" data-cat="'+c+'">'+c+'</button>';}).join("");
+  return '<main class="wrap"><div class="page-head"><span class="label">The Collection</span><h1>Shop</h1></div><div class="toolbar"><div class="filters" id="filters">'+chips+'</div><div class="sort"><span class="count" id="shopCount"></span><select id="sortSel" aria-label="Sort"><option value="featured">Featured</option><option value="low">Price: low to high</option><option value="high">Price: high to low</option><option value="name">Alphabetical</option></select></div></div><div class="grid" id="shopGrid" style="padding-bottom:1rem"></div></main>';
+}
+function renderShopGrid(){
+  var g=document.getElementById("shopGrid");if(!g)return;var list=PRODUCTS.slice();
+  if(shopState.cat!=="All")list=list.filter(function(p){return p.cat===shopState.cat;});
+  if(shopState.sort==="low")list.sort(function(a,b){return a.price-b.price;});
+  else if(shopState.sort==="high")list.sort(function(a,b){return b.price-a.price;});
+  else if(shopState.sort==="name")list.sort(function(a,b){return a.name.localeCompare(b.name);});
+  g.innerHTML=list.map(cardHTML).join("");
+  var c=document.getElementById("shopCount");if(c)c.textContent=list.length+" piece"+(list.length===1?"":"s");
+}
+var pdp={metal:METALS[0],size:SIZES[2]};
+function viewProduct(id){
+  var p=byId(id)||PRODUCTS[0];document.title=p.name+" — Aurum Atelier";pdp={metal:METALS[0],size:SIZES[2]};
+  var mc=METALS.map(function(m,i){return '<button class="chip" data-opt="metal" aria-pressed="'+(i===0)+'">'+m+'</button>';}).join("");
+  var sc=SIZES.map(function(s){return '<button class="chip" data-opt="size" aria-pressed="'+(s===pdp.size)+'">'+s+'</button>';}).join("");
+  var rel=PRODUCTS.filter(function(x){return x.id!==p.id;}).slice(0,4).map(cardHTML).join("");
+  return '<main class="wrap"><div class="pdp" data-id="'+p.id+'"><div class="gallery"><div class="main"><img src="'+IMG(p.base,1000)+'" alt="'+p.name+'"></div></div><div class="info"><div class="crumbs"><a href="#/shop">Shop</a> / '+p.cat+' / '+p.name+'</div><h1>'+p.name+'</h1><div class="price">'+inr(p.price)+(p.was?'<span class="was">'+inr(p.was)+'</span>':'')+'</div><p class="desc">'+p.desc+'</p><div class="opt"><div class="opt-label"><span class="label">Metal</span><span class="label sel" id="mSel">'+pdp.metal+'</span></div><div class="chips-row" id="mRow">'+mc+'</div></div><div class="opt"><div class="opt-label"><span class="label">Ring size (IN)</span><span class="label sel" id="sSel">'+pdp.size+'</span></div><div class="chips-row" id="sRow">'+sc+'</div></div><div class="buy"><button class="btn ink block" id="pdpAdd">Add to bag — '+inr(p.price)+'</button></div><div class="assurance"><span>BIS Hallmarked</span><span>Free insured shipping</span><span>30-day returns</span><span>Lifetime care</span></div></div></div><section class="block" style="padding-top:clamp(2rem,5vw,3.5rem)"><div class="sec-head"><div><span class="idx">You may also like</span><h2>More from the house</h2></div><a class="more" href="#/shop">View all →</a></div><div class="grid">'+rel+'</div></section></main>';
+}
+function wireProduct(id){
+  var p=byId(id)||PRODUCTS[0];
+  function wire(rowId,selId,key){var row=document.getElementById(rowId);if(!row)return;row.addEventListener("click",function(e){var chip=e.target.closest(".chip");if(!chip)return;[].forEach.call(row.querySelectorAll(".chip"),function(c){c.setAttribute("aria-pressed","false");});chip.setAttribute("aria-pressed","true");pdp[key]=chip.textContent;document.getElementById(selId).textContent=chip.textContent;});}
+  wire("mRow","mSel","metal");wire("sRow","sSel","size");
+  var add=document.getElementById("pdpAdd");if(add)add.addEventListener("click",function(){addToCart(p.id,pdp.metal,pdp.size,1);});
+}
+function viewCart(){return '<main class="wrap"><div class="page-head"><span class="label">Checkout</span><h1>Your Bag</h1></div><div class="cart-grid"><div class="cart-list" id="cartList"></div><div class="summary"><h3>Summary</h3><div class="line"><span>Subtotal</span><span id="sumSub">₹0</span></div><div class="line"><span>Shipping</span><span>Free · Insured</span></div><div class="line"><span>GST</span><span>Included</span></div><div class="line total"><span>Total</span><b id="sumTotal">₹0</b></div><button class="btn ink block" id="checkoutBtn" style="margin-top:1.2rem">Place order</button><a class="btn ghost block" href="#/shop" style="margin-top:.6rem">Continue shopping</a><p class="label" style="text-align:center;margin-top:1rem;color:var(--faint)">Demo checkout · no payment is taken</p></div></div></main>';}
+function renderCartPage(){
+  var list=document.getElementById("cartList");if(!list)return;var c=getCart();
+  if(!c.length){list.innerHTML='<p class="empty">Your bag is empty. <a class="gold" href="#/shop">Browse the collection →</a></p>';}
+  else{list.innerHTML=c.map(function(i,idx){var p=byId(i.id);if(!p)return"";return '<div class="c-row"><img src="'+IMG(p.base,220)+'" alt="'+p.name+'"><div><div class="cn">'+p.name+'</div><div class="co">'+i.metal+' · Size '+i.size+' · Ref. '+p.ref+'</div><div class="qty"><button data-dec="'+idx+'">−</button><span>'+i.qty+'</span><button data-inc="'+idx+'">+</button></div></div><div class="cp">'+inr(p.price*i.qty)+'</div></div>';}).join("");}
+  var sub=cartSubtotal();var a=document.getElementById("sumSub");if(a)a.textContent=inr(sub);var b=document.getElementById("sumTotal");if(b)b.textContent=inr(sub);var co=document.getElementById("checkoutBtn");if(co)co.disabled=!c.length;
+}
+var FOOT='<footer><div class="wrap"><div class="foot-grid"><div class="foot-brand"><div class="brand">AURUM<span class="dot">.</span></div><p>Hand-made fine jewellery from a small atelier in Bikaner, Rajasthan.</p></div><div class="foot-col"><h4>Shop</h4><a href="#/shop/Rings">Rings</a><a href="#/shop/Necklaces">Necklaces</a><a href="#/shop/Earrings">Earrings</a><a href="#/shop/Pendants">Pendants</a></div><div class="foot-col"><h4>House</h4><a href="#/#atelier">The Atelier</a><a href="#/">Our Story</a><a href="#/">Care &amp; Repair</a><a href="#/">Contact</a></div><div class="foot-col"><h4>Visit</h4><a href="#/">Bikaner Studio</a><a href="#/">Book an Appointment</a><a href="#/">+91 · by request</a></div></div><div class="foot-base"><span>© MMXXVI Aurum Atelier</span><span>Crafted in Rajasthan · BIS Hallmarked</span></div></div></footer>';
+
+/* -------- router -------- */
+function route(){
+  var h=location.hash.replace(/^#/,"")||"/";
+  var app=document.getElementById("app");
+  var anchor=null;
+  if(h.indexOf("/#")===0){ anchor=h.slice(2); h="/"; }
+  var parts=h.split("/").filter(Boolean); // e.g. ["shop","Rings"]
+  var html,page;
+  if(parts[0]==="shop"){ page="shop"; html=viewShop(parts[1]); }
+  else if(parts[0]==="product"){ page="product"; html=viewProduct(parts[1]); }
+  else if(parts[0]==="cart"){ page="cart"; html=viewCart(); }
+  else { page="home"; html=viewHome(); }
+  app.innerHTML=html+FOOT;
+  // nav active
+  [].forEach.call(document.querySelectorAll(".nav-links a"),function(a){a.classList.toggle("active",a.getAttribute("href")==="#/shop"&&page==="shop");});
+  if(page==="shop"){
+    var bar=document.getElementById("filters");
+    bar.addEventListener("click",function(e){var chip=e.target.closest(".chip");if(!chip)return;[].forEach.call(bar.querySelectorAll(".chip"),function(c){c.classList.remove("active");});chip.classList.add("active");shopState.cat=chip.dataset.cat;renderShopGrid();});
+    document.getElementById("sortSel").addEventListener("change",function(){shopState.sort=this.value;renderShopGrid();});
+    renderShopGrid();
+  }
+  if(page==="product")wireProduct(parts[1]);
+  if(page==="cart")renderCartPage();
+  if(page==="home"){document.title="Aurum Atelier — Fine Jewellery";var nf=document.getElementById("newsForm");if(nf)nf.addEventListener("submit",function(e){e.preventDefault();document.getElementById("newsMsg").textContent="Thank you — you're on the list.";nf.reset();});}
+  updateNav();
+  if(anchor){var el=document.getElementById(anchor);if(el){el.scrollIntoView();return;}}
+  window.scrollTo(0,0);
+}
+
+/* -------- global wiring -------- */
+document.addEventListener("click",function(e){
+  var add=e.target.closest(".js-add");if(add){e.preventDefault();addToCart(add.dataset.id);return;}
+  var rm=e.target.closest("[data-rm]");if(rm){removeAt(+rm.getAttribute("data-rm"));return;}
+  var dec=e.target.closest("[data-dec]");if(dec){setQty(+dec.getAttribute("data-dec"),-1);return;}
+  var inc=e.target.closest("[data-inc]");if(inc){setQty(+inc.getAttribute("data-inc"),1);return;}
+  if(e.target.closest(".js-bag-open")){e.preventDefault();renderDrawer();openDrawer();return;}
+  if(e.target.closest(".js-drawer-close")||e.target.id==="drawerBack"){closeDrawer();return;}
+  if(e.target.id==="checkoutBtn"){if(cartCount()){saveCart([]);renderCartPage();renderDrawer();toast("Order placed — demo checkout");}return;}
+  if(e.target.id==="drawerCheckout"){if(cartCount()){closeDrawer();location.hash="#/cart";}return;}
+});
+document.addEventListener("keydown",function(e){if(e.key==="Escape")closeDrawer();});
+var mb=document.getElementById("menuBtn"),mm=document.getElementById("mobileMenu");
+mb.addEventListener("click",function(){mm.classList.add("open");});
+mm.addEventListener("click",function(e){if(e.target.closest("a")||e.target.id==="mmClose")mm.classList.remove("open");});
+window.addEventListener("hashchange",function(){closeDrawer();route();});
+renderDrawer();route();
+})();
+</script>
+</body>
+</html>
