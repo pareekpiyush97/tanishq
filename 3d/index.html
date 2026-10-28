@@ -1,0 +1,1009 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>
+/* standalone equivalent of the artifact host skeleton */
+:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{margin:0;font:14px system-ui,-apple-system,sans-serif}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>Kanakmani Fine Jewellery</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Kanakmani — hallmarked 22K gold, hand-set diamonds and Bikaner kundan work. Turn the piece in real-time 3D and design your own.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=DM+Mono:wght@400;500&family=Hanken+Grotesk:wght@300;400;500;600&family=Tiro+Devanagari+Hindi&display=swap">
+<style>
+/* Layout: a fixed WebGL vitrine (velvet plinth + live piece) sits behind the page; content plates scroll past it, alternating sides so the piece always has room. */
+:root{
+  --velvet:#0b1713; --velvet-2:#112a22; --plate:rgba(12,27,22,.84);
+  --ivory:#efe6d3; --mist:#9fb0a6; --gold:#d8b26a; --gold-deep:#a9833f; --line:rgba(216,178,106,.24);
+  --display:"Bodoni Moda","Bodoni 72",Didot,"Bodoni MT",Georgia,serif;
+  --body:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"DM Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --deva:"Tiro Devanagari Hindi","Noto Serif Devanagari","Kohinoor Devanagari",serif;
+  --s-1:clamp(.78rem,.75rem + .15vw,.86rem); --s0:clamp(.98rem,.95rem + .15vw,1.05rem);
+  --s1:clamp(1.12rem,1.04rem + .4vw,1.32rem); --s2:clamp(1.5rem,1.25rem + 1.2vw,2.2rem);
+  --s3:clamp(2.2rem,1.55rem + 3vw,4rem); --s4:clamp(2.9rem,1.7rem + 5.6vw,6.4rem);
+  --gutL:max(16px,env(safe-area-inset-left,0px)); --gutR:max(16px,env(safe-area-inset-right,0px));
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{overflow-x:clip}
+body{background:var(--velvet);color:var(--ivory);font:400 var(--s0)/1.6 var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--velvet)}
+[id]{scroll-margin-top:84px}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+p{margin:0}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:var(--s4);line-height:.95;letter-spacing:-.03em}
+h1 em,h2 em{font-style:italic;color:var(--gold)}
+h2{font-size:var(--s3);line-height:1.02;letter-spacing:-.02em}
+h3{font-size:var(--s1);line-height:1.2}
+
+/* ---------- 3D stage ---------- */
+#stage{position:fixed;inset:0;width:100%;height:100%;display:block;z-index:0;touch-action:pan-y;cursor:grab}
+#stage:active{cursor:grabbing}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 95% at 50% 42%,transparent 52%,rgba(3,9,7,.7) 100%)}
+.fallback{position:fixed;inset:0;z-index:0;display:none;background:radial-gradient(26% 32% at 72% 46%,rgba(216,178,106,.3),transparent 72%),radial-gradient(60% 50% at 70% 60%,rgba(40,90,70,.35),transparent 70%),var(--velvet)}
+.no-webgl #stage{display:none}
+.no-webgl .fallback{display:block}
+.stage-status{position:fixed;right:var(--gutR);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:5;max-width:min(320px,calc(100vw - 32px));padding:.55rem .85rem;font:400 .74rem/1.4 var(--mono);letter-spacing:.06em;color:var(--mist);background:var(--plate);border:1px solid var(--line);border-radius:2px;transition:opacity .6s,visibility .6s}
+.stage-status .err{display:none}
+.no-webgl .stage-status .ok{display:none}
+.no-webgl .stage-status .err{display:inline}
+.ready:not(.no-webgl) .stage-status{opacity:0;visibility:hidden}
+
+/* ---------- page layers ---------- */
+header,main,footer{position:relative;z-index:2}
+.wrap{max-width:1240px;margin-inline:auto}
+section{pointer-events:none}
+.copy,.plate,.fourc,.hint,.cards{pointer-events:auto}
+
+/* ---------- header ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;margin-left:calc(-1 * var(--gutL));margin-right:calc(-1 * var(--gutR));padding-left:var(--gutL);padding-right:var(--gutR);background:rgba(9,20,16,.74);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:1.6rem;height:64px}
+.brand{display:flex;align-items:baseline;gap:.7rem;margin-right:auto;color:var(--ivory);text-decoration:none}
+.brand .mark{font:500 1rem/1 var(--display);letter-spacing:.34em}
+.brand .deva{font:400 .98rem/1 var(--deva);color:var(--gold)}
+.nav{display:flex;gap:1.7rem}
+.nav a{color:var(--mist);text-decoration:none;font-size:var(--s-1);letter-spacing:.06em;transition:color .2s}
+.nav a:hover{color:var(--ivory)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.6em;min-height:44px;padding:.85em 1.4em;font:600 var(--s-1)/1 var(--body);letter-spacing:.14em;text-transform:uppercase;text-decoration:none;border-radius:2px;cursor:pointer;transition:background .25s,color .25s,border-color .25s,transform .25s}
+.btn-gold{background:linear-gradient(180deg,#ebcb8a,#c8994a);color:#1d150a;border:1px solid #ecd39b}
+.btn-gold:hover{background:linear-gradient(180deg,#f2d79e,#d3a557)}
+.btn-ghost{background:transparent;color:var(--ivory);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+.top .btn{min-height:40px;padding:.7em 1.1em;white-space:nowrap}
+
+/* ---------- plates ---------- */
+.plate{background:linear-gradient(180deg,rgba(17,42,34,.86),rgba(10,22,18,.9));border:1px solid var(--line);border-radius:2px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.eyebrow{font:500 var(--s-1)/1.3 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:1.1rem}
+.muted{color:var(--mist)}
+
+/* ---------- hero ---------- */
+.hero{position:relative;min-height:min(840px,90svh);display:flex;overflow:clip}
+.hero-grid{width:100%;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);align-items:center;padding-block:clamp(48px,9vh,110px)}
+.hero .copy{grid-column:1;min-width:0}
+.lede{font-size:var(--s1);font-weight:300;color:var(--mist);max-width:36ch;margin-top:1.5rem;line-height:1.55}
+.cta{display:flex;flex-wrap:wrap;gap:.8rem;margin-top:2.1rem}
+.stamps{display:flex;flex-wrap:wrap;gap:.6rem 1.8rem;margin:2.4rem 0 0;padding:0;list-style:none;font:400 var(--s-1)/1.4 var(--mono);color:var(--mist)}
+.stamps b{color:var(--ivory);font-weight:500;margin-right:.45em}
+.watermark{position:absolute;left:-.04em;bottom:-.42em;z-index:-1;font:400 clamp(9rem,26vw,24rem)/1 var(--deva);color:transparent;-webkit-text-stroke:1px rgba(216,178,106,.09);pointer-events:none;user-select:none;white-space:nowrap}
+
+/* ---------- sections ---------- */
+.sec{padding-block:clamp(40px,7vh,90px)}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(24px,4vw,64px);align-items:center;min-height:clamp(600px,88svh,960px)}
+.split.right>*{grid-column:2}
+.split.left>*{grid-column:1}
+.split>*{min-width:0}
+
+/* the piece */
+.piece .wrap{display:flex;flex-direction:column;min-height:clamp(620px,92svh,980px)}
+.piece .copy{max-width:31rem}
+.spacer{flex:1;min-height:120px}
+.fourc{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem;margin:0;padding:1.3rem 1.5rem}
+.fourc>div{display:flex;flex-direction:column;gap:.2rem;min-width:0}
+.fourc dt{font:400 .72rem/1.4 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--mist)}
+.fourc dd{margin:0;font:400 var(--s2)/1.1 var(--display);color:var(--ivory)}
+.fourc span{font:400 .74rem/1.4 var(--mono);color:var(--gold)}
+.hint{margin-top:.9rem;font:400 .74rem/1.4 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mist)}
+
+/* atelier */
+.steps{list-style:none;margin:2rem 0 0;padding:0;display:grid;gap:1.2rem}
+.steps li{display:grid;grid-template-columns:3rem minmax(0,1fr);gap:1rem;padding-top:1.1rem;border-top:1px solid var(--line)}
+.steps .n{font:400 var(--s-1)/1.7 var(--mono);color:var(--gold)}
+.steps p{color:var(--mist);font-size:var(--s-1);margin-top:.3rem;max-width:46ch}
+
+/* studio */
+.studio-panel{padding:clamp(20px,3vw,34px);max-width:540px}
+.studio-panel h2{font-size:var(--s2);margin-bottom:1.6rem}
+.config{display:grid;gap:1.3rem}
+fieldset{border:0;margin:0;padding:0;min-width:0}
+legend{padding:0;margin-bottom:.65rem;font:500 .72rem/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--mist)}
+.opts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.5rem}
+.opts.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.opt{display:flex;flex-direction:column;align-items:flex-start;gap:.4rem;min-height:44px;padding:.65rem .7rem;background:rgba(239,230,211,.035);border:1px solid var(--line);border-radius:2px;color:var(--ivory);font:500 var(--s-1)/1.2 var(--body);text-align:left;cursor:pointer;transition:border-color .2s,background .2s}
+.opt:hover{border-color:rgba(216,178,106,.55)}
+.opt[aria-pressed="true"]{border-color:var(--gold);background:rgba(216,178,106,.12)}
+.opt small{font:400 .7rem/1 var(--mono);letter-spacing:.06em;color:var(--mist)}
+.sw{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28),0 0 0 1px rgba(0,0,0,.35)}
+.spec{display:grid;grid-template-columns:auto minmax(0,1fr);gap:.55rem 1.3rem;margin:1.6rem 0;padding-top:1.2rem;border-top:1px solid var(--line);font-variant-numeric:tabular-nums}
+.spec dt{font:400 .7rem/1.6 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mist)}
+.spec dd{margin:0;font-size:var(--s-1)}
+.studio-panel .btn{width:100%}
+
+/* collections */
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-top:2rem}
+.card{display:flex;flex-direction:column;gap:.5rem;padding:1.3rem 1.3rem 1.15rem;min-width:0}
+.card .k{font:400 .72rem/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--gold)}
+.card p{color:var(--mist);font-size:var(--s-1)}
+.link-btn{margin-top:auto;padding:.5rem 0 0;background:none;border:0;color:var(--gold);font:500 var(--s-1)/1.3 var(--body);letter-spacing:.04em;text-align:left;cursor:pointer;min-height:44px}
+.link-btn:hover{color:var(--ivory)}
+
+/* visit */
+.visit-form{padding:clamp(20px,3vw,34px);max-width:560px}
+.visit-form h2{font-size:var(--s2);margin-bottom:.9rem}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:1.6rem 0 1.4rem}
+.fields label{display:flex;flex-direction:column;gap:.45rem;min-width:0;font:400 .7rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mist)}
+.fields .full{grid-column:1/-1}
+.fields input{width:100%;min-width:0;min-height:44px;padding:.75rem .85rem;font:400 var(--s0)/1.3 var(--body);letter-spacing:0;text-transform:none;color:var(--ivory);background:rgba(239,230,211,.045);border:1px solid var(--line);border-radius:2px}
+.fields input::placeholder{color:rgba(159,176,166,.7)}
+.fields input:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.form-note{margin-top:1rem;font:400 .76rem/1.5 var(--mono);color:var(--mist)}
+
+/* footer */
+footer{border-top:1px solid var(--line);margin-top:clamp(40px,6vh,80px)}
+.foot{display:flex;flex-wrap:wrap;gap:1rem 2rem;align-items:baseline;padding-block:32px 40px;font:400 .76rem/1.5 var(--mono);color:var(--mist)}
+.foot .brand{margin-right:auto}
+
+/* ---------- motion ---------- */
+.rail{position:fixed;top:env(safe-area-inset-top,0px);left:0;right:0;height:2px;z-index:36;pointer-events:none}
+.rail i{display:block;width:0;height:100%;background:linear-gradient(90deg,#8a6a2e,#d8b26a 55%,#fff0cf);box-shadow:0 0 10px rgba(216,178,106,.65)}
+.glow{position:fixed;top:0;left:0;z-index:1;width:420px;height:420px;margin:-210px 0 0 -210px;border-radius:50%;pointer-events:none;opacity:0;background:radial-gradient(circle,rgba(216,178,106,.12),transparent 66%);transition:opacity .8s}
+
+.anim .top{animation:navIn .9s .1s both cubic-bezier(.2,.75,.2,1)}
+@keyframes navIn{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+
+.anim .rv{display:inline-block;opacity:0;transform:translateY(.6em) rotate(1.4deg);transition:opacity .9s cubic-bezier(.2,.75,.2,1),transform .9s cubic-bezier(.2,.75,.2,1)}
+.anim .in .rv{opacity:1;transform:none}
+.anim .fr{opacity:0;transform:translateY(26px);transition:opacity .85s ease,transform .85s cubic-bezier(.2,.75,.2,1)}
+.anim .fr.in{opacity:1;transform:none}
+
+.btn-gold{position:relative;overflow:hidden}
+.btn-gold::after{content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.55) 50%,transparent 62%);transform:translateX(-130%);transition:transform .85s ease;pointer-events:none}
+.btn-gold:hover::after,.btn-gold:focus-visible::after{transform:translateX(130%)}
+.btn-gold:active,.btn-ghost:active{transform:translateY(1px)}
+
+.opt{position:relative;overflow:hidden}
+.opt::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at var(--px,50%) var(--py,50%),rgba(216,178,106,.5),transparent 62%);opacity:0;transition:opacity .55s ease}
+.opt.ping::after{opacity:1;transition:none}
+.opt[aria-pressed="true"]{animation:pick .5s cubic-bezier(.2,.75,.2,1)}
+@keyframes pick{0%{transform:scale(1)}45%{transform:scale(.972)}100%{transform:scale(1)}}
+
+.spec dd{transition:color .45s ease,transform .45s cubic-bezier(.2,.75,.2,1)}
+.spec dd.flash{color:var(--gold);transform:translateX(3px)}
+
+.card{transition:border-color .35s ease,transform .45s cubic-bezier(.2,.75,.2,1)}
+.card:hover{border-color:rgba(216,178,106,.5);transform:translateY(-3px)}
+.steps li{transition:border-color .4s ease}
+.steps li:hover{border-color:rgba(216,178,106,.45)}
+.nav a::after{content:"";display:block;height:1px;width:0;background:var(--gold);transition:width .35s cubic-bezier(.2,.75,.2,1)}
+.nav a:hover::after{width:100%}
+.watermark{will-change:transform}
+
+/* ---------- narrow screens ---------- */
+@media (max-width:819px){
+  .nav{display:none}
+  .bar{height:58px;gap:1rem}
+  .brand .mark{letter-spacing:.24em}
+  .hero{min-height:0}
+  .hero-grid{grid-template-columns:1fr;padding-top:58svh;padding-bottom:56px}
+  .hero .copy{text-shadow:0 1px 14px rgba(0,0,0,.55)}
+  .split{grid-template-columns:1fr;min-height:0;padding-top:50svh}
+  .split>*{grid-column:1 !important}
+  .plate-m{padding:1.3rem;background:var(--plate);border:1px solid var(--line);border-radius:2px;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+  .piece .wrap{min-height:0}
+  .spacer{min-height:50svh}
+  .fourc{grid-template-columns:repeat(2,minmax(0,1fr));padding:1.1rem}
+  .opts{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .opts.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .cards{grid-template-columns:1fr}
+  .fields{grid-template-columns:1fr}
+}
+@media (max-width:419px){.top .brand .deva{display:none}.top .btn{letter-spacing:.1em;padding:.7em .9em}}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .btn,.opt,.stage-status{transition:none}
+}
+</style>
+</head>
+<body>
+<canvas id="stage" role="img" aria-label="Rotating 3D view: solitaire ring in 22K yellow gold with diamonds"></canvas>
+<div class="fallback" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+<div class="stage-status" role="status"><span class="ok">Lighting the vitrine…</span><span class="err">The 3D view needs WebGL. Everything else on the page works without it.</span></div>
+<div class="rail" aria-hidden="true"><i></i></div>
+<div class="glow" aria-hidden="true"></div>
+
+<header class="top">
+  <div class="bar wrap">
+    <a class="brand" href="#top" aria-label="Kanakmani, back to top"><span class="mark">KANAKMANI</span><span class="deva" lang="hi">कनकमणि</span></a>
+    <nav class="nav" aria-label="Sections">
+      <a href="#piece">The piece</a><a href="#atelier">Atelier</a><a href="#studio">Studio</a><a href="#collections">Collections</a>
+    </nav>
+    <a class="btn btn-gold" href="#visit">Book a viewing</a>
+  </div>
+</header>
+
+<main>
+  <section class="hero" id="top" data-stage data-nx=".5" data-ny="-.02" data-s=".9" data-mny=".3" data-ms=".7">
+    <div class="hero-grid wrap">
+      <div class="copy">
+        <p class="eyebrow">Fine jewellery · Bikaner · since 1962</p>
+        <h1>Heirlooms, <em>set by hand.</em></h1>
+        <p class="lede">Hallmarked 22K gold, hand-cut diamonds and Bikaner kundan work, made in one family atelier for three generations.</p>
+        <div class="cta">
+          <a class="btn btn-gold" href="#studio">Design your piece</a>
+          <a class="btn btn-ghost" href="#piece">Turn the ring</a>
+        </div>
+        <ul class="stamps">
+          <li><b>916</b>22K purity</li>
+          <li><b>BIS</b>hallmark with HUID</li>
+          <li><b>57</b>facets per brilliant</li>
+        </ul>
+      </div>
+    </div>
+    <span class="watermark" aria-hidden="true" lang="hi">कनक</span>
+  </section>
+
+  <section class="sec piece" id="piece" data-stage data-nx="0" data-ny="0" data-s="1.1" data-mny=".16" data-ms=".92">
+    <div class="wrap">
+      <div class="copy">
+        <p class="eyebrow">Under the loupe</p>
+        <h2>Drag to turn it. Each facet is cut to send light back to you.</h2>
+      </div>
+      <div class="spacer" aria-hidden="true"></div>
+      <dl class="fourc plate" aria-label="Diamond shown">
+        <div><dt>Cut</dt><dd>Round brilliant</dd><span>57 facets</span></div>
+        <div><dt>Colour</dt><dd>E</dd><span>colourless grade</span></div>
+        <div><dt>Clarity</dt><dd>VVS1</dd><span>clean at 10× loupe</span></div>
+        <div><dt>Carat</dt><dd>0.50 ct</dd><span>about 5.1 mm across</span></div>
+      </dl>
+      <p class="hint">Drag the piece to turn it · scroll to continue</p>
+    </div>
+  </section>
+
+  <section class="sec atelier" id="atelier" data-stage data-nx="-.46" data-ny="0" data-s=".95" data-mny=".3" data-ms=".68">
+    <div class="split right wrap">
+      <div class="copy plate-m">
+        <p class="eyebrow">Atelier</p>
+        <h2>Five stages, a karigar at each one.</h2>
+        <ol class="steps">
+          <li><span class="n">01</span><div><h3>Wax</h3><p>The form is carved in wax at true size, so the ring fits before any gold is poured.</p></div></li>
+          <li><span class="n">02</span><div><h3>Casting</h3><p>Molten 22K gold fills the mould. The wax burns away and leaves the shape behind.</p></div></li>
+          <li><span class="n">03</span><div><h3>Setting</h3><p>Each stone is seated under a 10× loupe and the prongs are folded over by hand.</p></div></li>
+          <li><span class="n">04</span><div><h3>Polishing</h3><p>Seven grades of polish, finishing with jeweller's rouge on a cotton wheel.</p></div></li>
+          <li><span class="n">05</span><div><h3>Hallmark</h3><p>A BIS assay centre tests the gold and laser-marks the purity grade and a 6-digit HUID inside the band.</p></div></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec studio" id="studio" data-stage data-nx=".46" data-ny="0" data-s="1" data-mny=".3" data-ms=".68">
+    <div class="split left wrap">
+      <div class="plate studio-panel">
+        <p class="eyebrow">Studio</p>
+        <h2>Design your piece</h2>
+        <div class="config">
+          <fieldset>
+            <legend>Piece</legend>
+            <div class="opts">
+              <button type="button" class="opt" data-k="piece" data-v="ring" aria-pressed="true">Ring<small>solitaire</small></button>
+              <button type="button" class="opt" data-k="piece" data-v="pendant" aria-pressed="false">Pendant<small>halo</small></button>
+              <button type="button" class="opt" data-k="piece" data-v="jhumka" aria-pressed="false">Jhumka<small>pair</small></button>
+              <button type="button" class="opt" data-k="piece" data-v="kada" aria-pressed="false">Kada<small>kundan</small></button>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Metal</legend>
+            <div class="opts">
+              <button type="button" class="opt" data-k="metal" data-v="y22" aria-pressed="true"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#fbe3a4,#d39f45 60%,#8a6324)"></span>22K yellow<small>916</small></button>
+              <button type="button" class="opt" data-k="metal" data-v="r18" aria-pressed="false"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#ffd9c8,#dc9378 60%,#8f5743)"></span>18K rose<small>750</small></button>
+              <button type="button" class="opt" data-k="metal" data-v="w18" aria-pressed="false"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#ffffff,#cfccc2 60%,#7d7a72)"></span>18K white<small>750</small></button>
+              <button type="button" class="opt" data-k="metal" data-v="pt" aria-pressed="false"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#f4f6f8,#b7bcc1 60%,#6b7177)"></span>Platinum<small>950</small></button>
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Stone</legend>
+            <div class="opts three">
+              <button type="button" class="opt" data-k="stone" data-v="heera" aria-pressed="true"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#ffffff,#d9e4ee 55%,#8ea0b1)"></span>Heera<small>diamond</small></button>
+              <button type="button" class="opt" data-k="stone" data-v="panna" aria-pressed="false"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#9ff2c6,#139a5c 55%,#04452a)"></span>Panna<small>emerald</small></button>
+              <button type="button" class="opt" data-k="stone" data-v="manik" aria-pressed="false"><span class="sw" style="background:radial-gradient(circle at 35% 30%,#ffb3c0,#c8183a 55%,#5e0716)"></span>Manik<small>ruby</small></button>
+            </div>
+          </fieldset>
+        </div>
+        <dl class="spec" aria-live="polite">
+          <dt>Piece</dt><dd id="sp-piece">Solitaire ring</dd>
+          <dt>Metal</dt><dd id="sp-metal">22K yellow gold · 916</dd>
+          <dt>Weight</dt><dd id="sp-weight">≈ 3.4 g</dd>
+          <dt>Stones</dt><dd id="sp-stones">0.50 ct round diamond, 12 pavé shoulders</dd>
+          <dt>Refractive index</dt><dd id="sp-ri">2.42</dd>
+          <dt>Hallmark</dt><dd id="sp-mark">BIS 916 with 6-digit HUID</dd>
+          <dt>Making</dt><dd>Made to order in 3 to 4 weeks</dd>
+        </dl>
+        <button type="button" class="btn btn-gold" id="book-this">Book a viewing for this piece</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec collections" id="collections" data-stage data-nx="-.5" data-ny=".02" data-s=".82" data-mny=".3" data-ms=".68">
+    <div class="split right wrap">
+      <div class="copy">
+        <p class="eyebrow">Collections</p>
+        <h2>Four collections, one workshop.</h2>
+        <div class="cards">
+          <article class="card plate"><p class="k">Dulhan</p><h3>Bridal</h3><p>Rani haar, maang tikka and kundan chokers for the wedding day.</p><button type="button" class="link-btn" data-preset="jhumka,y22,manik">Try ruby jhumkas →</button></article>
+          <article class="card plate"><p class="k">Rozana</p><h3>Everyday</h3><p>Light pieces in 18K rose and white gold, made to be worn daily.</p><button type="button" class="link-btn" data-preset="pendant,r18,heera">Try a rose-gold pendant →</button></article>
+          <article class="card plate"><p class="k">Kundan-meena</p><h3>Heritage</h3><p>Uncut stones set in pure gold foil, with enamel painted on the reverse.</p><button type="button" class="link-btn" data-preset="kada,y22,panna">Try an emerald kada →</button></article>
+          <article class="card plate"><p class="k">Signet &amp; kada</p><h3>Men's</h3><p>Signet rings, plain kadas and platinum bands with a single stone.</p><button type="button" class="link-btn" data-preset="ring,pt,heera">Try a platinum solitaire →</button></article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec visit" id="visit" data-stage data-nx=".47" data-ny="0" data-s=".9" data-mny=".3" data-ms=".68">
+    <div class="split left wrap">
+      <form class="plate visit-form" id="visit-form" novalidate>
+        <p class="eyebrow">Private viewing</p>
+        <h2>Book a viewing</h2>
+        <p class="muted">Sit with a karigar, try pieces under daylight lamps and read the hallmark yourself. Viewings at the Bikaner atelier are by appointment.</p>
+        <div class="fields">
+          <label for="f-name">Name<input id="f-name" name="name" autocomplete="name" required></label>
+          <label for="f-phone">Phone<input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required></label>
+          <label for="f-date">Preferred date<input id="f-date" name="date" type="date" required></label>
+          <label for="f-time">Time<input id="f-time" name="time" type="time" min="10:00" max="19:00" value="11:00"></label>
+          <label for="f-piece" class="full">Piece<input id="f-piece" name="piece" placeholder="e.g. Solitaire ring, 22K yellow gold"></label>
+        </div>
+        <button type="submit" class="btn btn-gold">Request a viewing</button>
+        <p class="form-note" id="form-note" role="status" aria-live="polite">Concept site: requests stay on this page and are not sent.</p>
+      </form>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot wrap">
+    <a class="brand" href="#top"><span class="mark">KANAKMANI</span><span class="deva" lang="hi">कनकमणि</span></a>
+    <span>Atelier &amp; showroom · Bikaner, Rajasthan · by appointment</span>
+    <span>© 2026 Kanakmani Fine Jewellery · concept site</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  var root=document.documentElement;
+  var PIECES={
+    ring:{name:'Solitaire ring',vol:.19,stones:function(S){return '0.50 ct round '+S.short+', 12 pavé shoulders';}},
+    pendant:{name:'Halo pendant',vol:.12,stones:function(S){return '0.70 ct '+S.short+' centre, 16-stone halo';}},
+    jhumka:{name:'Jhumka earrings, pair',vol:.55,stones:function(S){return S.short+' centres, 16 seed pearls per earring';}},
+    kada:{name:'Kundan kada',vol:1.6,stones:function(S){return '20 '+S.short+' stones in kundan bezels';}}
+  };
+  var METALS={
+    y22:{name:'22K yellow gold',mark:'916',d:17.8},
+    r18:{name:'18K rose gold',mark:'750',d:15.1},
+    w18:{name:'18K white gold',mark:'750',d:15.9},
+    pt:{name:'Platinum',mark:'950',d:20.7}
+  };
+  var STONES={
+    heera:{short:'diamond',ri:'2.42'},
+    panna:{short:'emerald',ri:'1.57 to 1.58'},
+    manik:{short:'ruby',ri:'1.76 to 1.77'}
+  };
+  var state={piece:'ring',metal:'y22',stone:'heera'};
+  function $(s){return document.querySelector(s);}
+  function put(s,v){var el=$(s);if(el)el.textContent=v;}
+  function summary(){return PIECES[state.piece].name+', '+METALS[state.metal].name+', '+STONES[state.stone].short;}
+  function render(){
+    document.querySelectorAll('[data-k]').forEach(function(b){
+      b.setAttribute('aria-pressed',String(state[b.getAttribute('data-k')]===b.getAttribute('data-v')));
+    });
+    var P=PIECES[state.piece],M=METALS[state.metal],S=STONES[state.stone];
+    put('#sp-piece',P.name);
+    put('#sp-metal',M.name+' · '+M.mark);
+    put('#sp-weight','≈ '+(P.vol*M.d).toFixed(1)+' g');
+    put('#sp-stones',P.stones(S));
+    put('#sp-ri',S.ri);
+    put('#sp-mark',state.metal==='pt'?'Pt 950 stamp with assay certificate':'BIS '+M.mark+' with 6-digit HUID');
+    window.KM_STATE={piece:state.piece,metal:state.metal,stone:state.stone};
+    document.dispatchEvent(new CustomEvent('km:config',{detail:window.KM_STATE}));
+  }
+  function go(sel,focusSel){
+    var el=$(sel);if(!el)return;
+    var rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});
+    if(focusSel){var f=$(focusSel);if(f)setTimeout(function(){f.focus({preventScroll:true});},rm?0:650);}
+  }
+  document.addEventListener('click',function(e){
+    var b=e.target.closest('[data-k]');
+    if(b){state[b.getAttribute('data-k')]=b.getAttribute('data-v');render();return;}
+    var p=e.target.closest('[data-preset]');
+    if(p){var v=p.getAttribute('data-preset').split(',');state.piece=v[0];state.metal=v[1];state.stone=v[2];render();go('#studio');}
+  });
+  $('#book-this').addEventListener('click',function(){$('#f-piece').value=summary();go('#visit','#f-name');});
+
+  var form=$('#visit-form'),note=$('#form-note'),dateIn=$('#f-date');
+  try{var t=new Date();t.setMinutes(t.getMinutes()-t.getTimezoneOffset());dateIn.min=t.toISOString().slice(0,10);}catch(err){}
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    if(!form.checkValidity()){
+      var bad=form.querySelector(':invalid');if(bad)bad.focus();
+      note.textContent='Add your name, phone and a preferred date to request a viewing.';
+      return;
+    }
+    var name=$('#f-name').value.trim();
+    var when=dateIn.value?new Date(dateIn.value+'T00:00').toLocaleDateString(undefined,{day:'numeric',month:'long',year:'numeric'}):'';
+    var piece=$('#f-piece').value.trim();
+    note.textContent='Thank you, '+name+'. '+when+' at '+($('#f-time').value||'11:00')+' is noted'+(piece?' for the '+piece.charAt(0).toLowerCase()+piece.slice(1):'')+'. This concept page does not send requests anywhere.';
+  });
+
+  setTimeout(function(){if(!root.classList.contains('ready'))root.classList.add('no-webgl');},12000);
+  window.addEventListener('km:ready',function(){root.classList.remove('no-webgl');});
+
+  function start(data){
+    if(data&&data.config){for(var k in state){if(data.config[k])state[k]=data.config[k];}}
+    render();
+  }
+  if(window.claude&&window.claude.hot&&window.claude.hot.snapshot){
+    window.claude.hot.snapshot(function(){return {config:{piece:state.piece,metal:state.metal,stone:state.stone}};});
+  }
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+
+<script>
+(function(){
+  'use strict';
+  var root=document.documentElement;
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var rail=document.querySelector('.rail i');
+  var wm=document.querySelector('.watermark');
+  var queued=false;
+  function onScroll(){
+    queued=false;
+    var h=document.documentElement.scrollHeight-innerHeight;
+    if(rail) rail.style.width=(h>0?Math.min(100,Math.max(0,scrollY/h*100)):0).toFixed(2)+'%';
+    if(wm&&!reduce) wm.style.transform='translate3d('+(-scrollY*.06).toFixed(1)+'px,'+(scrollY*.1).toFixed(1)+'px,0)';
+  }
+  addEventListener('scroll',function(){if(!queued){queued=true;requestAnimationFrame(onScroll);}},{passive:true});
+  addEventListener('resize',onScroll); onScroll();
+
+  if(reduce) return;
+  root.classList.add('anim');
+
+  function wrapWords(node,ctr){
+    [].slice.call(node.childNodes).forEach(function(n){
+      if(n.nodeType===3){
+        if(!n.nodeValue.trim()) return;
+        var frag=document.createDocumentFragment();
+        n.nodeValue.split(/(\s+)/).forEach(function(part){
+          if(!part) return;
+          if(/^\s+$/.test(part)){frag.appendChild(document.createTextNode(part));return;}
+          var sp=document.createElement('span');
+          sp.className='rv'; sp.textContent=part;
+          sp.style.transitionDelay=(ctr.i++*0.062).toFixed(3)+'s';
+          frag.appendChild(sp);
+        });
+        node.replaceChild(frag,n);
+      }else if(n.nodeType===1&&!n.classList.contains('rv')){
+        wrapWords(n,ctr);
+      }
+    });
+  }
+  var heads=[].slice.call(document.querySelectorAll('h1, h2'));
+  heads.forEach(function(h){wrapWords(h,{i:0});});
+
+  var blocks=[].slice.call(document.querySelectorAll('.eyebrow,.lede,.cta,.stamps,.fourc,.hint,.steps li,.card,.config,.spec,.studio-panel>.btn,.visit-form .muted,.visit-form .fields,.visit-form>.btn,.form-note'));
+  blocks.forEach(function(b,i){b.classList.add('fr');b.style.transitionDelay=((i%5)*0.06).toFixed(3)+'s';});
+
+  function show(el){el.classList.add('in');}
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){show(e.target);io.unobserve(e.target);}});
+  },{threshold:.1,rootMargin:'0px 0px -5% 0px'});
+  heads.concat(blocks).forEach(function(el){io.observe(el);});
+
+  requestAnimationFrame(function(){
+    document.querySelectorAll('#top h1, #top .fr').forEach(show);
+  });
+  setTimeout(function(){heads.concat(blocks).forEach(show);},4500);
+
+  function countUp(el,dur){
+    var m=(el.textContent||'').trim().match(/^([\d.]+)(.*)$/);
+    if(!m) return;
+    var target=parseFloat(m[1]), dec=(m[1].split('.')[1]||'').length, suffix=m[2], t0=0;
+    function step(now){
+      if(!t0) t0=now;
+      var p=Math.min(1,(now-t0)/dur), e=1-Math.pow(1-p,3);
+      el.textContent=(target*e).toFixed(dec)+suffix;
+      if(p<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  var cio=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){countUp(e.target,1100);cio.unobserve(e.target);}});
+  },{threshold:.55});
+  document.querySelectorAll('.stamps b, .fourc dd').forEach(function(el){
+    if(/^[\d.]+/.test(el.textContent.trim())) cio.observe(el);
+  });
+
+  if(matchMedia('(pointer: fine)').matches){
+    var glow=document.querySelector('.glow');
+    if(glow){
+      var gx=innerWidth/2,gy=innerHeight/2,tx=gx,ty=gy,lit=false;
+      addEventListener('pointermove',function(e){tx=e.clientX;ty=e.clientY;if(!lit){lit=true;glow.style.opacity='1';}},{passive:true});
+      (function gl(){gx+=(tx-gx)*.1;gy+=(ty-gy)*.1;glow.style.transform='translate3d('+gx.toFixed(1)+'px,'+gy.toFixed(1)+'px,0)';requestAnimationFrame(gl);})();
+    }
+  }
+
+  document.addEventListener('pointerdown',function(e){
+    var o=e.target.closest('.opt');
+    if(!o) return;
+    var r=o.getBoundingClientRect();
+    o.style.setProperty('--px',((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
+    o.style.setProperty('--py',((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
+    o.classList.add('ping');
+    setTimeout(function(){o.classList.remove('ping');},40);
+  });
+
+  var spec=document.querySelector('.spec');
+  if(spec&&window.MutationObserver){
+    new MutationObserver(function(ms){
+      ms.forEach(function(m){
+        var dd=m.target.nodeType===3?m.target.parentNode:m.target;
+        if(dd&&dd.tagName==='DD'){
+          dd.classList.remove('flash'); void dd.offsetWidth; dd.classList.add('flash');
+          setTimeout(function(){dd.classList.remove('flash');},720);
+        }
+      });
+    }).observe(spec,{childList:true,characterData:true,subtree:true});
+  }
+})();
+</script>
+
+<script type="module" onerror="document.documentElement.classList.add('no-webgl')">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+const root=document.documentElement;
+const canvas=document.getElementById('stage');
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const finePointer=matchMedia('(pointer: fine)').matches;
+
+try{ main(); }catch(err){ console.error(err); root.classList.add('no-webgl'); }
+
+function main(){
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, innerWidth<820?1.5:1.75));
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.02;
+
+  const VELVET=new THREE.Color('#0b1713');
+  const scene=new THREE.Scene();
+  scene.background=VELVET.clone();
+  scene.fog=new THREE.Fog(VELVET.clone(),8.5,15);
+
+  const camera=new THREE.PerspectiveCamera(30,1,.1,60);
+  const LOOK=new THREE.Vector3(0,-.05,0);
+  camera.position.set(0,.55,7.4);
+
+  /* ---- studio light environment: softboxes in a dark room ---- */
+  {
+    const env=new THREE.Scene();
+    env.add(new THREE.Mesh(new THREE.BoxGeometry(16,9,16),new THREE.MeshBasicMaterial({color:new THREE.Color(.02,.03,.026),side:THREE.BackSide})));
+    const box=(w,h,x,y,z,i,tint='#fff4e4')=>{
+      const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(tint).multiplyScalar(i)}));
+      m.position.set(x,y,z); m.lookAt(0,0,0); env.add(m);
+    };
+    box(7,3,.01,4.3,.6,5);
+    box(3,4.5,-7.5,1.4,2.5,8);
+    box(1.2,6,7.5,.6,.8,6,'#e6eeff');
+    box(7,.7,0,1.1,-7.5,4);
+    box(5,1,0,-2,7.5,1.6,'#ffe7c4');
+    box(.5,.5,-2.5,3.6,5,28);
+    box(.35,.35,3.6,2.8,-4,24,'#eaf1ff');
+    const pm=new THREE.PMREMGenerator(renderer);
+    scene.environment=pm.fromScene(env,.03).texture;
+    pm.dispose();
+  }
+  const key=new THREE.DirectionalLight('#fff1dc',1.4); key.position.set(-3,5,4); scene.add(key);
+  const rim=new THREE.DirectionalLight('#cfe0ff',.9); rim.position.set(4,2,-5); scene.add(rim);
+  scene.add(new THREE.HemisphereLight('#f6e7cc','#06100c',.25));
+
+  /* ---- materials ---- */
+  const METAL={y22:{c:'#e8b65e',r:.16},r18:{c:'#eba58c',r:.17},w18:{c:'#e1dfd7',r:.13},pt:{c:'#cdd1d4',r:.11}};
+  const STONE={
+    heera:{c:'#ffffff',att:'#ffffff',ad:Infinity,ior:2.42,irid:.5,core:'#ffffff',acc:'#ffffff'},
+    panna:{c:'#c4f6da',att:'#0c8a4e',ad:.42,ior:1.58,irid:.12,core:'#2fd18a',acc:'#38c987'},
+    manik:{c:'#ffc6d0',att:'#b10f2e',ad:.42,ior:1.77,irid:.12,core:'#ff3355',acc:'#e3294b'}
+  };
+  const metal=new THREE.MeshPhysicalMaterial({color:METAL.y22.c,metalness:1,roughness:.16,clearcoat:.3,clearcoatRoughness:.15,envMapIntensity:1.35,side:THREE.DoubleSide});
+  const stoneMat=new THREE.MeshPhysicalMaterial({color:'#ffffff',metalness:0,roughness:0,transmission:1,thickness:.9,ior:2.42,specularIntensity:1,envMapIntensity:2.4,iridescence:.5,iridescenceIOR:1.8,iridescenceThicknessRange:[120,780],flatShading:true,attenuationColor:new THREE.Color('#ffffff'),attenuationDistance:Infinity});
+  const coreMat=new THREE.MeshStandardMaterial({color:'#ffffff',metalness:1,roughness:.03,flatShading:true,envMapIntensity:2.3});
+  const accMat=new THREE.MeshStandardMaterial({color:'#ffffff',metalness:1,roughness:.04,flatShading:true,envMapIntensity:2.6});
+  const pearlMat=new THREE.MeshPhysicalMaterial({color:'#f3ede2',roughness:.28,metalness:0,clearcoat:.7,clearcoatRoughness:.2,iridescence:.6,iridescenceIOR:1.35,sheen:.5,sheenColor:new THREE.Color('#ffe8d0'),envMapIntensity:1.1});
+  const velvetMat=new THREE.MeshPhysicalMaterial({color:'#0f2a20',roughness:.92,metalness:0,sheen:1,sheenRoughness:.5,sheenColor:new THREE.Color('#5c8c74'),envMapIntensity:.3});
+
+  /* ---- shared geometry ---- */
+  const V2=a=>a.map(p=>new THREE.Vector2(p[0],p[1]));
+  const brilliant=new THREE.LatheGeometry(V2([[0,-.86],[.5,-.43],[1,0],[1,.035],[.8,.17],[.56,.31],[0,.31]]),16);
+  const accentGeo=new THREE.LatheGeometry(V2([[0,-.7],[1,0],[1,.06],[.55,.3],[0,.3]]),8);
+  const UP=new THREE.Vector3(0,1,0);
+  function rod(a,b,r1,r2,mat=metal,seg=10){
+    const d=new THREE.Vector3().subVectors(b,a); const L=d.length();
+    const m=new THREE.Mesh(new THREE.CylinderGeometry(r2,r1,L,seg),mat);
+    m.position.copy(a).addScaledVector(d,.5);
+    m.quaternion.setFromUnitVectors(UP,d.normalize());
+    return m;
+  }
+  function mainStone(s){
+    const g=new THREE.Group();
+    const core=new THREE.Mesh(brilliant,coreMat); core.scale.setScalar(.8); core.position.y=-.02;
+    const st=new THREE.Mesh(brilliant,stoneMat);
+    g.add(core,st); g.scale.setScalar(s); g.userData.host=st;
+    return g;
+  }
+  function accent(s){const m=new THREE.Mesh(accentGeo,accMat); m.scale.setScalar(s); return m;}
+
+  /* ---- pieces ---- */
+  function buildRing(){
+    const g=new THREE.Group(); const R=1,t=.075;
+    const band=new THREE.Mesh(new THREE.TorusGeometry(R,t,40,200),metal); band.scale.z=2.1; g.add(band);
+    const s=.36, top=R+t, gy=top+.86*s*.72;
+    const stone=mainStone(s); stone.position.y=gy; g.add(stone);
+    const b1=new THREE.Mesh(new THREE.TorusGeometry(s*.62,.016,10,48),metal); b1.rotation.x=Math.PI/2; b1.position.y=gy-.3*s; g.add(b1);
+    const b2=new THREE.Mesh(new THREE.TorusGeometry(s*.36,.016,10,40),metal); b2.rotation.x=Math.PI/2; b2.position.y=gy-.62*s; g.add(b2);
+    for(let i=0;i<6;i++){
+      const a=i/6*Math.PI*2+Math.PI/6, c=Math.cos(a), z=Math.sin(a);
+      g.add(rod(new THREE.Vector3(c*s*.28,top-.02,z*s*.28),new THREE.Vector3(c*s*1.0,gy+.1*s,z*s*1.0),.024,.016));
+      const tip=new THREE.Mesh(new THREE.SphereGeometry(.026,12,10),metal); tip.position.set(c*s*.95,gy+.13*s,z*s*.95); g.add(tip);
+    }
+    for(const side of [-1,1]) for(const deg of [22,32,42]) for(const zz of [-.065,.065]){
+      const a=Math.PI/2+side*THREE.MathUtils.degToRad(deg);
+      const dir=new THREE.Vector3(Math.cos(a),Math.sin(a),0);
+      const m=accent(.04); m.position.copy(dir).multiplyScalar(R+t*.92); m.position.z=zz;
+      m.quaternion.setFromUnitVectors(UP,dir); g.add(m);
+    }
+    g.userData.glints=[[stone.userData.host,5,.9,1.6]];
+    return g;
+  }
+
+  function buildPendant(){
+    const g=new THREE.Group(); const s=.42;
+    const st=mainStone(s); st.rotation.x=Math.PI/2; g.add(st);
+    g.add(new THREE.Mesh(new THREE.TorusGeometry(s*1.02,.03,12,64),metal));
+    const hr=s*1.45;
+    const back=new THREE.Mesh(new THREE.TorusGeometry(hr,.055,14,80),metal); back.position.z=-.04; g.add(back);
+    for(let i=0;i<16;i++){
+      const a=i/16*Math.PI*2; const m=accent(.075);
+      m.position.set(Math.cos(a)*hr,Math.sin(a)*hr,.03); m.rotation.x=Math.PI/2; g.add(m);
+    }
+    const bailY=hr+.16;
+    const bail=new THREE.Mesh(new THREE.TorusGeometry(.1,.028,12,32),metal); bail.position.y=bailY; bail.rotation.y=Math.PI/2; g.add(bail);
+    g.add(rod(new THREE.Vector3(0,hr+.03,0),new THREE.Vector3(0,bailY-.08,0),.03,.025));
+    const N=44; const chain=new THREE.InstancedMesh(new THREE.TorusGeometry(.036,.011,6,14),metal,N*2);
+    const m4=new THREE.Matrix4(), q=new THREE.Quaternion(), q2=new THREE.Quaternion(), X=new THREE.Vector3(1,0,0), sc=new THREE.Vector3(1.7,1,1);
+    let k=0;
+    for(const side of [-1,1]){
+      const c=new THREE.QuadraticBezierCurve3(new THREE.Vector3(0,bailY+.08,0),new THREE.Vector3(side*.28,bailY+1.1,.02),new THREE.Vector3(side*1.9,bailY+3.3,-.7));
+      for(let i=0;i<N;i++){
+        const u=i/(N-1), p=c.getPointAt(u), tg=c.getTangentAt(u);
+        q.setFromUnitVectors(X,tg); q2.setFromAxisAngle(tg,(i%2)*Math.PI/2); q.premultiply(q2);
+        m4.compose(p,q,sc); chain.setMatrixAt(k++,m4);
+      }
+    }
+    chain.instanceMatrix.needsUpdate=true; g.add(chain);
+    g.userData.glints=[[st.userData.host,5,.8,1.4]];
+    return g;
+  }
+
+  function buildJhumkaOne(){
+    const g=new THREE.Group();
+    const stud=new THREE.Group(); stud.position.y=1.32;
+    const disc=new THREE.Mesh(new THREE.CylinderGeometry(.3,.3,.05,40),metal); disc.rotation.x=Math.PI/2; disc.position.z=-.04; stud.add(disc);
+    const c=mainStone(.14); c.rotation.x=Math.PI/2; c.position.z=.02; stud.add(c);
+    for(let i=0;i<8;i++){const a=i/8*Math.PI*2; const m=accent(.065); m.position.set(Math.cos(a)*.215,Math.sin(a)*.215,.01); m.rotation.x=Math.PI/2; stud.add(m);}
+    g.add(stud);
+    const link=new THREE.Mesh(new THREE.TorusGeometry(.065,.02,10,24),metal); link.position.y=1.0; link.rotation.y=Math.PI/2; g.add(link);
+    g.add(new THREE.Mesh(new THREE.LatheGeometry(V2([[.66,-.07],[.64,-.055],[.6,0],[.53,.22],[.44,.5],[.3,.74],[.14,.88],[.03,.93]]),40),metal));
+    for(const [y,r] of [[0,.605],[.22,.535],[.5,.445],[.74,.305]]){
+      const b=new THREE.Mesh(new THREE.TorusGeometry(r,.017,8,64),metal); b.rotation.x=Math.PI/2; b.position.y=y; g.add(b);
+    }
+    const m4=new THREE.Matrix4();
+    const gran=new THREE.InstancedMesh(new THREE.SphereGeometry(.021,8,6),metal,40);
+    for(let i=0;i<40;i++){const a=i/40*Math.PI*2; m4.makeTranslation(Math.cos(a)*.665,-.075,Math.sin(a)*.665); gran.setMatrixAt(i,m4);}
+    g.add(gran);
+    const pearls=new THREE.InstancedMesh(new THREE.SphereGeometry(.058,20,14),pearlMat,16);
+    const wires=new THREE.InstancedMesh(new THREE.CylinderGeometry(.008,.008,.22,6),metal,16);
+    for(let i=0;i<16;i++){
+      const a=i/16*Math.PI*2+.1, x=Math.cos(a)*.6, z=Math.sin(a)*.6;
+      m4.makeTranslation(x,-.36,z); pearls.setMatrixAt(i,m4);
+      m4.makeTranslation(x,-.2,z); wires.setMatrixAt(i,m4);
+    }
+    g.add(pearls,wires);
+    const bead=new THREE.Mesh(new THREE.SphereGeometry(.085,24,16),pearlMat); bead.position.y=-.2; g.add(bead);
+    g.add(rod(new THREE.Vector3(0,.9,0),new THREE.Vector3(0,-.12,0),.01,.01));
+    g.userData.glints=[[c.userData.host,3,1.8,2.8]];
+    return g;
+  }
+  function buildJhumka(){
+    const g=new THREE.Group(), a=buildJhumkaOne(), b=buildJhumkaOne();
+    a.position.set(-.72,0,0); a.rotation.y=.35;
+    b.position.set(.72,0,-.25); b.rotation.y=-.5;
+    g.add(a,b); g.userData.glints=[...a.userData.glints,...b.userData.glints];
+    return g;
+  }
+
+  function buildKada(){
+    const g=new THREE.Group();
+    const sh=new THREE.Shape(); sh.absarc(0,0,1.1,0,Math.PI*2,false);
+    const hole=new THREE.Path(); hole.absarc(0,0,.85,0,Math.PI*2,true); sh.holes.push(hole);
+    const geo=new THREE.ExtrudeGeometry(sh,{depth:.24,bevelEnabled:true,bevelThickness:.05,bevelSize:.045,bevelSegments:5,curveSegments:160});
+    geo.translate(0,0,-.12);
+    g.add(new THREE.Mesh(geo,metal));
+    const zf=.172; const m4=new THREE.Matrix4();
+    const bez=new THREE.InstancedMesh(new THREE.TorusGeometry(.098,.013,8,28),metal,20);
+    const hosts=[];
+    for(let i=0;i<20;i++){
+      const a=i/20*Math.PI*2, x=Math.cos(a)*.975, y=Math.sin(a)*.975;
+      const m=accent(i%2?.062:.088); m.position.set(x,y,zf); m.rotation.x=Math.PI/2; g.add(m);
+      if(i%4===0) hosts.push(m);
+      m4.makeTranslation(x,y,zf-.004); bez.setMatrixAt(i,m4);
+    }
+    g.add(bez);
+    const gran=new THREE.InstancedMesh(new THREE.SphereGeometry(.016,8,6),metal,180);
+    for(let i=0;i<180;i++){
+      const r=i<90?.885:1.065, a=(i%90)/90*Math.PI*2;
+      m4.makeTranslation(Math.cos(a)*r,Math.sin(a)*r,zf-.006); gran.setMatrixAt(i,m4);
+    }
+    g.add(gran);
+    g.userData.glints=hosts.map(h=>[h,1,2.6,4.2]);
+    return g;
+  }
+
+  /* ---- scene graph: stage (scroll position) > floater (bob) > swapper (piece change) > spinner (turn) ---- */
+  const stage=new THREE.Group(), floater=new THREE.Group(), swapper=new THREE.Group(), spinner=new THREE.Group();
+  scene.add(stage); stage.add(floater); floater.add(swapper); swapper.add(spinner);
+
+  const plinth=new THREE.Mesh(new THREE.CylinderGeometry(2.05,2.2,.36,120),velvetMat); plinth.position.y=-1.56; stage.add(plinth);
+  const lip=new THREE.Mesh(new THREE.TorusGeometry(2.05,.014,8,160),metal); lip.rotation.x=Math.PI/2; lip.position.y=-1.38; stage.add(lip);
+  /* volumetric shaft falling from the ceiling softbox onto the velvet */
+  const shaft=(()=>{
+    const c=document.createElement('canvas'); c.width=16; c.height=128; const x=c.getContext('2d');
+    const g=x.createLinearGradient(0,0,0,128);
+    g.addColorStop(0,'rgba(255,241,214,.5)'); g.addColorStop(.5,'rgba(255,236,202,.13)'); g.addColorStop(1,'rgba(255,232,194,0)');
+    x.fillStyle=g; x.fillRect(0,0,16,128);
+    const tex=new THREE.CanvasTexture(c); tex.colorSpace=THREE.SRGBColorSpace;
+    const H=5.4;
+    const m=new THREE.Mesh(new THREE.CylinderGeometry(.55,2.5,H,56,1,true),
+      new THREE.MeshBasicMaterial({map:tex,transparent:true,opacity:.085,depthWrite:false,blending:THREE.AdditiveBlending,side:THREE.DoubleSide,fog:false}));
+    m.position.y=H/2-1.42; stage.add(m); return m;
+  })();
+  {
+    const c=document.createElement('canvas'); c.width=c.height=256; const x=c.getContext('2d');
+    const gr=x.createRadialGradient(128,128,0,128,128,128);
+    gr.addColorStop(0,'rgba(0,0,0,.78)'); gr.addColorStop(.45,'rgba(0,0,0,.35)'); gr.addColorStop(1,'rgba(0,0,0,0)');
+    x.fillStyle=gr; x.fillRect(0,0,256,256);
+    const sh=new THREE.Mesh(new THREE.PlaneGeometry(3,3),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c),transparent:true,depthWrite:false}));
+    sh.rotation.x=-Math.PI/2; sh.position.y=-1.374; stage.add(sh);
+  }
+
+  const BASE={ring:{s:1,y:-.05},pendant:{s:1,y:-.12},jhumka:{s:1.05,y:-.38},kada:{s:.86,y:.02}};
+  const builders={ring:buildRing,pendant:buildPendant,jhumka:buildJhumka,kada:buildKada};
+  const pieces={}, glints={};
+
+  /* diamond star glints: the four-point sparkle from jewellery photography */
+  const starTex=(()=>{
+    const c=document.createElement('canvas'); c.width=c.height=128; const x=c.getContext('2d');
+    const g=x.createRadialGradient(64,64,0,64,64,64);
+    g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(.1,'rgba(255,247,228,.9)');
+    g.addColorStop(.32,'rgba(255,232,192,.16)'); g.addColorStop(1,'rgba(255,232,192,0)');
+    x.fillStyle=g; x.fillRect(0,0,128,128); x.globalCompositeOperation='lighter';
+    const ray=(w,l,a)=>{x.save();x.translate(64,64);x.rotate(a);const lg=x.createLinearGradient(-l,0,l,0);
+      lg.addColorStop(0,'rgba(255,255,255,0)');lg.addColorStop(.5,'rgba(255,255,255,.95)');lg.addColorStop(1,'rgba(255,255,255,0)');
+      x.fillStyle=lg;x.fillRect(-l,-w/2,l*2,w);x.restore();};
+    ray(3,64,0); ray(3,64,Math.PI/2); ray(1.6,40,Math.PI/4); ray(1.6,40,-Math.PI/4);
+    const t=new THREE.CanvasTexture(c); t.colorSpace=THREE.SRGBColorSpace; return t;
+  })();
+
+  for(const k in builders){
+    const p=builders[k](); p.scale.setScalar(BASE[k].s); p.position.y=BASE[k].y;
+    spinner.add(p); pieces[k]=p; glints[k]=[];
+    for(const [host,count,min,max] of p.userData.glints){
+      for(let i=0;i<count;i++){
+        const mat=new THREE.SpriteMaterial({map:starTex,color:'#fff8ec',transparent:true,depthWrite:false,depthTest:false,blending:THREE.AdditiveBlending,opacity:0,fog:false});
+        const sp=new THREE.Sprite(mat);
+        const a=Math.random()*Math.PI*2, r=.3+Math.random()*.55;
+        sp.position.set(Math.cos(a)*r,.17+Math.random()*.14,Math.sin(a)*r);
+        host.add(sp);
+        glints[k].push({sp,mat,ph:Math.random()*10,f:.7+Math.random()*1.3,base:min+Math.random()*(max-min)});
+      }
+    }
+  }
+
+  /* gold dust in the air */
+  const DN=reduce?140:320;
+  const dpos=new Float32Array(DN*3), dspd=new Float32Array(DN);
+  for(let i=0;i<DN;i++){dpos[i*3]=(Math.random()-.5)*9; dpos[i*3+1]=-2.2+Math.random()*4.8; dpos[i*3+2]=-3+Math.random()*5; dspd[i]=.05+Math.random()*.12;}
+  const dgeo=new THREE.BufferGeometry(); dgeo.setAttribute('position',new THREE.BufferAttribute(dpos,3));
+  const dotTex=(()=>{const c=document.createElement('canvas');c.width=c.height=32;const x=c.getContext('2d');const g=x.createRadialGradient(16,16,0,16,16,16);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,32,32);return new THREE.CanvasTexture(c);})();
+  const dust=new THREE.Points(dgeo,new THREE.PointsMaterial({size:.035,map:dotTex,color:'#e8c98a',transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending}));
+  scene.add(dust);
+
+  /* gold burst thrown off when the piece or setting changes */
+  const BN=72;
+  const bpos=new Float32Array(BN*3), bvel=new Float32Array(BN*3);
+  const bgeo=new THREE.BufferGeometry(); bgeo.setAttribute('position',new THREE.BufferAttribute(bpos,3));
+  const bmat=new THREE.PointsMaterial({size:.08,map:dotTex,color:'#ffdfa6',transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,fog:false});
+  const burst=new THREE.Points(bgeo,bmat); burst.frustumCulled=false; stage.add(burst);
+  let burstL=0;
+  function fireBurst(){
+    if(reduce) return;
+    burstL=1;
+    for(let i=0;i<BN;i++){
+      const a=Math.random()*Math.PI*2, e=Math.acos(2*Math.random()-1), sp=1.2+Math.random()*2.1;
+      const sx=Math.sin(e)*Math.cos(a), sy=Math.cos(e), sz=Math.sin(e)*Math.sin(a);
+      bpos[i*3]=sx*.14; bpos[i*3+1]=sy*.14; bpos[i*3+2]=sz*.14;
+      bvel[i*3]=sx*sp; bvel[i*3+1]=sy*sp*.8+.6; bvel[i*3+2]=sz*sp;
+    }
+    bgeo.attributes.position.needsUpdate=true;
+  }
+
+  /* ---- configuration from the studio panel ---- */
+  const NAMES={piece:{ring:'solitaire ring',pendant:'halo pendant',jhumka:'pair of jhumka earrings',kada:'kundan kada'},metal:{y22:'22K yellow gold',r18:'18K rose gold',w18:'18K white gold',pt:'platinum'},stone:{heera:'diamonds',panna:'emeralds',manik:'rubies'}};
+  const mt={color:new THREE.Color(METAL.y22.c),rough:.16};
+  const stt={color:new THREE.Color('#fff'),att:new THREE.Color('#fff'),core:new THREE.Color('#fff'),acc:new THREE.Color('#fff')};
+  let active='ring', nextPiece=null, swap=1, swapT=1;
+  function apply(c,instant){
+    const M=METAL[c.metal]||METAL.y22, S=STONE[c.stone]||STONE.heera, p=pieces[c.piece]?c.piece:'ring';
+    mt.color.set(M.c); mt.rough=M.r;
+    stt.color.set(S.c); stt.att.set(S.att); stt.core.set(S.core); stt.acc.set(S.acc);
+    stoneMat.ior=S.ior; stoneMat.iridescence=S.irid; stoneMat.attenuationDistance=S.ad;
+    if(instant){
+      metal.color.copy(mt.color); metal.roughness=M.r;
+      stoneMat.color.copy(stt.color); stoneMat.attenuationColor.copy(stt.att); coreMat.color.copy(stt.core); accMat.color.copy(stt.acc);
+      for(const k in pieces) pieces[k].visible=(k===p);
+      active=p; nextPiece=null; swap=swapT=1;
+    }else{
+      fireBurst();
+      if(p===active){ nextPiece=null; swapT=1; }
+      else { nextPiece=p; swapT=0; }
+    }
+    canvas.setAttribute('aria-label',`Rotating 3D view: ${NAMES.piece[p]} in ${NAMES.metal[c.metal]||'gold'} with ${NAMES.stone[c.stone]||'diamonds'}`);
+  }
+
+  /* ---- scroll choreography: each section says where the piece should sit ---- */
+  const secs=[...document.querySelectorAll('[data-stage]')];
+  const tg={nx:.42,ny:0,s:1};
+  function pickStage(){
+    const mid=innerHeight*.5; let best=secs[0], bd=Infinity;
+    for(const s of secs){const r=s.getBoundingClientRect(); const d=mid<r.top?r.top-mid:(mid>r.bottom?mid-r.bottom:0); if(d<bd){bd=d;best=s;}}
+    const ds=best.dataset, narrow=innerWidth<820;
+    tg.nx=narrow?+(ds.mnx||0):+ds.nx; tg.ny=narrow?+(ds.mny||.3):+ds.ny; tg.s=narrow?+(ds.ms||.8):+ds.s;
+  }
+  function resize(){
+    const w=innerWidth,h=innerHeight;
+    renderer.setSize(w,h,false);
+    camera.aspect=w/h; camera.fov=camera.aspect<.8?38:30; camera.updateProjectionMatrix();
+    pickStage();
+  }
+  addEventListener('resize',resize); addEventListener('scroll',pickStage,{passive:true});
+
+  /* ---- drag to turn, pointer parallax ---- */
+  let spin=-.5, spinV=0, tilt=.14, tiltT=.14, intro=reduce?1:0, t0=0;
+  const drag={on:false,x:0,y:0,id:null};
+  canvas.addEventListener('pointerdown',e=>{drag.on=true;drag.x=e.clientX;drag.y=e.clientY;drag.id=e.pointerId;spinV=0;try{canvas.setPointerCapture(e.pointerId);}catch(_){}});
+  canvas.addEventListener('pointermove',e=>{
+    if(!drag.on||e.pointerId!==drag.id) return;
+    const dx=e.clientX-drag.x, dy=e.clientY-drag.y; drag.x=e.clientX; drag.y=e.clientY;
+    spin+=dx*.009; spinV=dx*.003;
+    if(e.pointerType!=='touch') tiltT=THREE.MathUtils.clamp(tiltT+dy*.004,-.35,.6);
+  });
+  const endDrag=e=>{if(e.pointerId===drag.id){drag.on=false;tiltT=.14;}};
+  canvas.addEventListener('pointerup',endDrag); canvas.addEventListener('pointercancel',endDrag);
+  const ptr={x:0,y:0}, cam={x:0,y:.55};
+  if(finePointer&&!reduce) addEventListener('pointermove',e=>{ptr.x=e.clientX/innerWidth-.5;ptr.y=e.clientY/innerHeight-.5;},{passive:true});
+
+  /* ---- frame ---- */
+  const cur={x:0,y:0,s:1}, wp=new THREE.Vector3();
+  let lastScroll=scrollY;
+  function update(dt,t){
+    const halfH=Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.position.z, halfW=halfH*camera.aspect;
+    const k=1-Math.exp(-dt*(reduce?40:3.2));
+    cur.x+=(tg.nx*halfW-cur.x)*k; cur.y+=(tg.ny*halfH-cur.y)*k; cur.s+=(tg.s-cur.s)*k;
+    stage.position.set(cur.x,cur.y,0); stage.scale.setScalar(cur.s*(.82+.18*intro));
+
+    if(!t0) t0=t;
+    intro=reduce?1:1-Math.pow(1-Math.min(1,(t-t0)/1.3),3);
+    const sy=scrollY; if(!reduce) spinV+=(sy-lastScroll)*.00045; lastScroll=sy;
+    if(!drag.on){ spin+=(reduce?0:.22)*dt+spinV; spinV*=Math.pow(.05,dt); }
+    spinner.rotation.y=spin+(1-intro)*1.2;
+    tilt+=(tiltT-tilt)*(1-Math.exp(-dt*4)); spinner.rotation.x=tilt;
+    floater.position.y=(reduce?0:Math.sin(t*1.1)*.035)+(1-intro)*1.25;
+
+    swap+=(swapT-swap)*(1-Math.exp(-dt*(reduce?80:9)));
+    if(nextPiece&&swap<.03){pieces[active].visible=false; active=nextPiece; nextPiece=null; pieces[active].visible=true; swapT=1;}
+    swapper.scale.setScalar(Math.max(.0001,swap)); swapper.rotation.y=(1-swap)*1.25;
+
+    const mk=1-Math.exp(-dt*(reduce?60:6));
+    metal.color.lerp(mt.color,mk); metal.roughness+=(mt.rough-metal.roughness)*mk;
+    stoneMat.color.lerp(stt.color,mk); stoneMat.attenuationColor.lerp(stt.att,mk);
+    coreMat.color.lerp(stt.core,mk); accMat.color.lerp(stt.acc,mk);
+
+    if(!reduce){
+      shaft.rotation.y=t*.09; shaft.material.opacity=.085+Math.sin(t*.42)*.028;
+      plinth.rotation.y=-t*.045; lip.rotation.z=t*.045;
+      const la=t*.33;
+      rim.position.set(Math.cos(la)*5.4,2+Math.sin(la*.8)*1.3,Math.sin(la)*-5.4);
+      key.position.set(-3+Math.sin(t*.21)*1.8,5,4+Math.cos(t*.21)*1.3);
+      renderer.toneMappingExposure=1.02+Math.sin(t*.5)*.055;
+    }
+    if(burstL>0){
+      burstL=Math.max(0,burstL-dt*.8);
+      const ba=bgeo.attributes.position.array;
+      for(let i=0;i<BN;i++){
+        bvel[i*3+1]-=dt*1.25;
+        ba[i*3]+=bvel[i*3]*dt; ba[i*3+1]+=bvel[i*3+1]*dt; ba[i*3+2]+=bvel[i*3+2]*dt;
+        bvel[i*3]*=.965; bvel[i*3+2]*=.965;
+      }
+      bgeo.attributes.position.needsUpdate=true;
+      bmat.opacity=burstL*burstL*.95; bmat.size=.045+burstL*.07;
+    }else if(bmat.opacity){ bmat.opacity=0; }
+    const ck=1-Math.exp(-dt*2.5);
+    cam.x+=(ptr.x*.32-cam.x)*ck; cam.y+=(.55-ptr.y*.18-cam.y)*ck;
+    camera.position.x=cam.x; camera.position.y=cam.y; camera.lookAt(LOOK);
+
+    for(const g of glints[active]){
+      let v=reduce?.45:Math.max(0,Math.sin(t*g.f+g.ph)); if(!reduce) v=v*v*v*v;
+      g.sp.getWorldPosition(wp);
+      g.mat.opacity=wp.z>-.05?v*.9*swap:0;
+      const sc=g.base*(.35+.65*v); g.sp.scale.set(sc,sc,1);
+      g.mat.rotation=t*.15+g.ph;
+    }
+    if(!reduce){
+      const pa=dgeo.attributes.position.array;
+      for(let i=0;i<DN;i++){pa[i*3+1]+=dspd[i]*dt; pa[i*3]+=Math.sin(t*.3+i)*.0006; if(pa[i*3+1]>2.6) pa[i*3+1]=-2.2;}
+      dgeo.attributes.position.needsUpdate=true;
+    }
+  }
+
+  resize();
+  for(const k in pieces) pieces[k].visible=true;
+  renderer.compile(scene,camera);
+  apply(window.KM_STATE||{piece:'ring',metal:'y22',stone:'heera'},true);
+  document.addEventListener('km:config',e=>apply(e.detail,false));
+  cur.x=tg.nx*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.position.z*camera.aspect;
+  cur.y=tg.ny*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))*camera.position.z; cur.s=tg.s;
+
+  let raf=0, last=performance.now(), announced=false;
+  function loop(now){
+    raf=requestAnimationFrame(loop);
+    const dt=Math.min(.05,(now-last)/1000); last=now;
+    update(dt,now/1000);
+    renderer.render(scene,camera);
+    if(!announced){announced=true; root.classList.add('ready'); window.dispatchEvent(new Event('km:ready'));}
+  }
+  raf=requestAnimationFrame(loop);
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden) cancelAnimationFrame(raf);
+    else { last=performance.now(); raf=requestAnimationFrame(loop); }
+  });
+}
+</script>
+</body>
+</html>
